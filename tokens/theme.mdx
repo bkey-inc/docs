@@ -1,0 +1,99 @@
+---
+title: Theme
+description: BMoniTheme — the Flutter ThemeData factory and themed text style extension.
+---
+
+## Overview
+
+`BMoniTheme` bridges the BMoni token system into Flutter's Material theme. It provides a `darkTheme()` factory and a `BMoniTextStylesExtension` for accessing theme-coloured text styles from `BuildContext`.
+
+---
+
+## Applying the theme
+
+```dart
+import 'package:bkey_uikit/bkey_uikit.dart';
+import 'package:flutter/material.dart';
+
+MaterialApp(
+  theme: BMoniTheme.darkTheme(),
+  home: const MyApp(),
+)
+```
+
+### Custom colour scheme
+
+Pass a custom `ColorScheme` to override specific colours while keeping all typography and component styles:
+
+```dart
+MaterialApp(
+  theme: BMoniTheme.darkTheme(
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: Colors.teal,
+      brightness: Brightness.dark,
+    ),
+  ),
+)
+```
+
+---
+
+## BMoniTheme API
+
+| Member | Type | Description |
+|---|---|---|
+| `darkTheme({ColorScheme?})` | `static ThemeData` | Returns a fully configured dark `ThemeData` |
+| `textTheme` | `static TextTheme` | `TextTheme` built from `BMoniTextStyles` |
+| `of(BuildContext)` | `static BMoniTextStylesExtension` | Access theme-coloured text styles |
+
+---
+
+## Theme-coloured text styles
+
+Use `BMoniTheme.of(context)` to get text styles that automatically use `colorScheme.onSurface` as their default colour:
+
+```dart
+Text(
+  'Hello',
+  style: BMoniTheme.of(context).h4Semibold,
+)
+```
+
+Every style from the type scale is available (`.d1Bold`, `.h3Semibold`, `.p2Regular`, `.l1Medium`, etc.).
+
+Utility methods apply specific colour roles:
+
+```dart
+Text('Primary', style: BMoniTheme.of(context).primary(BMoniTextStyles.h5Semibold))
+Text('Error',   style: BMoniTheme.of(context).error(BMoniTextStyles.p3Regular))
+```
+
+| Method | Applies colour |
+|---|---|
+| `onPrimary(style)` | `colorScheme.onPrimary` |
+| `onSecondary(style)` | `colorScheme.onSecondary` |
+| `primary(style)` | `colorScheme.primary` |
+| `secondary(style)` | `colorScheme.secondary` |
+| `error(style)` | `colorScheme.error` |
+| `onSurface(style)` | `colorScheme.onSurface` |
+| `onSurfaceVariant(style)` | `colorScheme.onSurfaceVariant` |
+
+---
+
+## Theme-aware colours
+
+Use the `BuildContext` extension from `BMoniColors` to get semantic colours that follow the current theme brightness:
+
+```dart
+// Backgrounds
+context.colors.bg.greySubtle
+context.colors.bg.brandSolid
+
+// Borders
+context.colors.border.greyDefault
+
+// Text
+context.colors.text.greyDark
+```
+
+See [Colors](/tokens/colors) for the full token reference.

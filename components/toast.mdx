@@ -1,0 +1,94 @@
+---
+title: Toast
+description: BMoniToast and BMoniToastOverlay — in-app notification banners.
+---
+
+## BMoniToast
+
+A styled notification banner. Four variants: default (info), warning, success, and error.
+
+```dart
+BMoniToast(
+  message: 'Payment of $50 sent successfully.',
+  variant: BMoniToastVariant.success,
+  title: 'Sent!',
+)
+```
+
+### Props
+
+<ParamField path="message" type="String" required>Main notification text.</ParamField>
+<ParamField path="variant" type="BMoniToastVariant" default="default_">
+  `default_`, `warning`, `success`, or `error`.
+</ParamField>
+<ParamField path="title" type="String?">Bold heading above the message.</ParamField>
+<ParamField path="trailing" type="Widget?">Custom trailing widget. Defaults to a chevron or close icon.</ParamField>
+<ParamField path="toastType" type="BMoniToastType" default="actionable">
+  `actionable` shows a chevron; `closeable` shows an ✕.
+</ParamField>
+<ParamField path="showTrailing" type="bool" default="true" />
+<ParamField path="onTap" type="VoidCallback?" />
+
+### Convenience constructors
+
+```dart
+BMoniToast.success(message: 'Done!')
+BMoniToast.error(message: 'Something went wrong')
+BMoniToast.warning(message: 'Low balance')
+BMoniToast.info(message: 'New feature available')
+```
+
+---
+
+## BMoniToastOverlay
+
+Displays a `BMoniToast` as a floating overlay above the current page. Supports swipe-to-dismiss (up or right) and auto-hides after a configurable duration.
+
+### Show a toast
+
+```dart
+BMoniToastOverlay.showSuccess(
+  context: context,
+  message: 'Transfer complete',
+  title: 'Success',
+  duration: const Duration(seconds: 4),
+);
+```
+
+Available helper methods:
+
+| Method | Variant |
+|---|---|
+| `showDefault(...)` | `default_` (info) |
+| `showWarning(...)` | `warning` |
+| `showSuccess(...)` | `success` |
+| `showError(...)` | `error` |
+| `showInfo(...)` | `default_` (alias) |
+
+All helpers accept:
+
+<ParamField path="context" type="BuildContext" required />
+<ParamField path="message" type="String" required />
+<ParamField path="title" type="String?" />
+<ParamField path="duration" type="Duration" default="Duration(seconds: 4)" />
+<ParamField path="isBottom" type="bool" default="false">Show at the bottom of the screen instead of the top.</ParamField>
+<ParamField path="trailing" type="Widget?" />
+<ParamField path="onTap" type="VoidCallback?" />
+
+### Low-level show / hide
+
+```dart
+BMoniToastOverlay.show(
+  context: context,
+  message: 'Custom toast',
+  variant: BMoniToastVariant.warning,
+  duration: const Duration(seconds: 6),
+);
+
+// Dismiss programmatically
+BMoniToastOverlay.hide();
+```
+
+<Warning>
+  Only one toast is shown at a time. Showing a new toast automatically dismisses any existing one.
+</Warning>

@@ -1,0 +1,110 @@
+---
+title: Typography
+description: BMoniTextStyles — the complete Rethink Sans type scale.
+---
+
+## Overview
+
+`BMoniTextStyles` is a static class providing every text style in the BMoni design system. All styles use the **Rethink Sans** font family bundled inside the package.
+
+```dart
+import 'package:bkey_uikit/bkey_uikit.dart';
+
+Text('Headline', style: BMoniTextStyles.h4Semibold)
+Text('Body copy', style: BMoniTextStyles.p2Regular)
+```
+
+## Type scale
+
+The scale is organised into four categories: **Display**, **Heading**, **Paragraph**, and **Label**. Each category has weight variants.
+
+### Display (D1–D6)
+
+Large, impactful text for hero sections and splash screens.
+
+| Style | Size | Weight | Line height |
+|---|---|---|---|
+| `d1Regular` – `d1Bold` | 64 | 400–700 | 1.2 |
+| `d2Regular` – `d2Bold` | 56 | 400–700 | 1.2 |
+| `d3Regular` – `d3Bold` | 48 | 400–700 | 1.25 |
+| `d4Regular` – `d4Bold` | 40 | 400–700 | 1.25 |
+| `d5Regular` – `d5Bold` | 32 | 400–700 | 1.3 |
+| `d6Regular` – `d6Bold` | 24 | 400–700 | 1.35 |
+
+Available weights for all display styles: `Regular` (400), `Medium` (500), `Semibold` (600), `Bold` (700).
+
+### Heading (H1–H6)
+
+Section headings and card titles.
+
+| Style | Size | Weights |
+|---|---|---|
+| `h1Semibold` / `h1Bold` | 32 | 600, 700 |
+| `h2Semibold` / `h2Bold` | 28 | 600, 700 |
+| `h3Semibold` / `h3Bold` | 24 | 600, 700 |
+| `h4Semibold` / `h4Bold` | 20 | 600, 700 |
+| `h5Semibold` / `h5Bold` | 18 | 600, 700 |
+| `h6Semibold` / `h6Bold` | 16 | 600, 700 |
+
+### Paragraph (P1–P4)
+
+Body copy at various reading sizes.
+
+| Style | Size | Weights |
+|---|---|---|
+| `p1Regular` / `p1Medium` | 18 | 400, 500 |
+| `p2Regular` / `p2Medium` | 16 | 400, 500 |
+| `p3Regular` / `p3Medium` | 14 | 400, 500 |
+| `p4Regular` / `p4Medium` | 12 | 400, 500 |
+
+### Label (L1–L4)
+
+UI labels, form inputs, captions.
+
+| Style | Size | Weights | Letter spacing |
+|---|---|---|---|
+| `l1Regular` / `l1Medium` | 16 | 400, 500 | +0.01 |
+| `l2Regular` / `l2Medium` | 14 | 400, 500 | +0.01 |
+| `l3Regular` / `l3Medium` | 12 | 400, 500 | +0.02 |
+| `l4Regular` / `l4Medium` | 10 | 400, 500 | +0.02 |
+
+---
+
+## Flutter TextTheme mapping
+
+`BMoniTextStyles` exposes convenience getters that match Flutter's `TextTheme` slot names:
+
+| Getter | Maps to |
+|---|---|
+| `displayLarge` | `d1Bold` |
+| `displayMedium` | `d2Bold` |
+| `displaySmall` | `d3Bold` |
+| `headlineLarge` | `h1Bold` |
+| `headlineMedium` | `h2Bold` |
+| `headlineSmall` | `h3Bold` |
+| `titleLarge` | `h4Semibold` |
+| `titleMedium` | `h5Semibold` |
+| `titleSmall` | `h6Semibold` |
+| `bodyLarge` | `p1Regular` |
+| `bodyMedium` | `p2Regular` |
+| `bodySmall` | `p3Regular` |
+| `labelLarge` | `l1Medium` |
+| `labelMedium` | `l2Medium` |
+| `labelSmall` | `l3Medium` |
+
+These are automatically wired into Flutter's theme by `BMoniTheme.darkTheme()`, so `Theme.of(context).textTheme.titleLarge` resolves correctly.
+
+---
+
+## Widget helpers
+
+For convenience, use the typed text widgets instead of applying styles manually:
+
+```dart
+HeadingText('Section title', level: 3, weight: HeadingWeight.semibold)
+BodyText('Paragraph copy', size: BodySize.medium)
+LabelText('Form label', size: LabelSize.large, weight: LabelWeight.medium)
+DisplayText('Hero headline', level: 4, weight: DisplayWeight.bold)
+```
+
+See [Text widgets](/components/text-widgets) for full documentation.

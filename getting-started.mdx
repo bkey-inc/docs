@@ -1,0 +1,92 @@
+---
+title: Getting started
+description: Add bkey_uikit to your Flutter project in three steps.
+---
+
+## Installation
+
+<Steps>
+  <Step title="Add the dependency">
+    Add `bkey_uikit` to your `pubspec.yaml`.
+
+    **Monorepo / local path:**
+
+    ```yaml pubspec.yaml
+    dependencies:
+      bkey_uikit:
+        path: ../bkey_uikit
+    ```
+
+    **Git (private registry):**
+
+    ```yaml pubspec.yaml
+    dependencies:
+      bkey_uikit:
+        git:
+          url: https://github.com/bkey-inc/bkey_uikit.git
+          ref: main
+    ```
+  </Step>
+
+  <Step title="Run pub get">
+    ```bash
+    flutter pub get
+    ```
+  </Step>
+
+  <Step title="Apply the theme">
+    Wrap your `MaterialApp` with `BMoniTheme.darkTheme()` to activate the full token system.
+
+    ```dart main.dart
+    import 'package:bkey_uikit/bkey_uikit.dart';
+    import 'package:flutter/material.dart';
+
+    void main() {
+      runApp(
+        MaterialApp(
+          theme: BMoniTheme.darkTheme(),
+          home: const MyHomePage(),
+        ),
+      );
+    }
+    ```
+  </Step>
+</Steps>
+
+## Import
+
+All public API is available from a single barrel import:
+
+```dart
+import 'package:bkey_uikit/bkey_uikit.dart';
+```
+
+You never need to import from `src/` paths directly.
+
+## Font registration
+
+The package bundles **Rethink Sans** (400–800 weights, regular and italic). Flutter automatically discovers package fonts when `pubspec.yaml` declares them — no additional setup required in the host app.
+
+If you want to override the font, pass a custom `ThemeData` to `BMoniTheme.darkTheme(colorScheme: ...)`.
+
+## Package structure
+
+```
+lib/
+  bkey_uikit.dart        ← single barrel export
+  src/
+    tokens/
+      colors.dart        ← BMoniColors
+      text_styles.dart   ← BMoniTextStyles
+      bmoni_theme.dart   ← BMoniTheme
+    enums/               ← shared enumerations
+    components/          ← ~30 widget files
+assets/
+  fonts/                 ← Rethink Sans TTF files
+```
+
+## Running tests
+
+```bash
+flutter test
+```

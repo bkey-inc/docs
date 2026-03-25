@@ -1,0 +1,112 @@
+---
+title: Avatars & media
+description: ProfileAvatar, ChatAvatar, ProfileImageWidget, CountryFlagWidget, and FileUploadWidget.
+---
+
+## ProfileAvatar
+
+Circular avatar that displays a cached network image, or falls back to rendered initials when no image is available.
+
+```dart
+ProfileAvatar(
+  imageUrl: 'https://cdn.example.com/avatar.jpg',
+  name: 'John Doe',
+  size: 48,
+)
+```
+
+<ParamField path="imageUrl" type="String?" required>URL of the profile image. Pass `null` to always show initials.</ParamField>
+<ParamField path="name" type="String" required>Used to derive initials when there is no image.</ParamField>
+<ParamField path="size" type="double" required>Diameter of the avatar in logical pixels.</ParamField>
+
+The initials helper `buildInitialsAvatar(context, name, size)` is also exported for custom avatar layouts.
+
+---
+
+## ChatAvatar
+
+Avatar optimised for chat threads. Uses a deterministic background colour based on `userId` so each contact always gets the same colour.
+
+```dart
+ChatAvatar(
+  imageUrl: member.avatarUrl,
+  name: member.displayName,
+  userId: member.id,
+  size: 40,
+)
+```
+
+<ParamField path="imageUrl" type="String?" required />
+<ParamField path="name" type="String" required>Used for the initial fallback.</ParamField>
+<ParamField path="userId" type="String?">Drives the deterministic background colour. Falls back to `name` if omitted.</ParamField>
+<ParamField path="size" type="double" default="48" />
+<ParamField path="radius" type="double?">When set, clips to a rounded rectangle instead of a circle.</ParamField>
+
+---
+
+## ProfileImageWidget
+
+A flexible image widget that supports network URLs, local asset paths, and file paths, with built-in loading and error states.
+
+```dart
+ProfileImageWidget(
+  imageUrl: 'https://cdn.example.com/photo.jpg',
+  radius: 32,
+)
+```
+
+<ParamField path="imageUrl" type="String" required>Network URL (`https://…`), asset path (`assets/…`), or file path.</ParamField>
+<ParamField path="radius" type="double?">Half the diameter when you want to express size as a radius.</ParamField>
+<ParamField path="width" type="double?" />
+<ParamField path="height" type="double?" />
+<ParamField path="placeholder" type="Widget?">Custom loading widget.</ParamField>
+<ParamField path="errorWidget" type="Widget?">Custom error widget.</ParamField>
+<ParamField path="onTap" type="VoidCallback?" />
+<ParamField path="fit" type="BoxFit?" default="BoxFit.cover" />
+
+---
+
+## CountryFlagWidget
+
+Renders a country flag from an asset path with consistent clipping and a placeholder fallback.
+
+```dart
+CountryFlagWidget(
+  flagAsset: 'assets/images/flags/ng.png',
+  width: 32,
+  height: 24,
+)
+```
+
+<ParamField path="flagAsset" type="String?">Asset path to the flag image. Renders a placeholder icon when `null` or empty.</ParamField>
+<ParamField path="width" type="double" default="32" />
+<ParamField path="height" type="double" default="24" />
+<ParamField path="borderRadius" type="double" default="4" />
+
+---
+
+## FileUploadWidget
+
+Dotted-border upload area that handles three states: empty, uploading, and uploaded.
+
+```dart
+FileUploadWidget(
+  onTap: _pickFile,
+  onRemove: _removeFile,
+  fileBytes: _selectedFileBytes,
+  fileName: _selectedFileName,
+  placeholderText: 'Tap to upload your ID',
+  errorMessage: _error,
+)
+```
+
+<ParamField path="onTap" type="VoidCallback" required>Opens the file picker.</ParamField>
+<ParamField path="fileBytes" type="Uint8List?">When set, the widget switches to the uploaded state.</ParamField>
+<ParamField path="fileName" type="String?">Display name of the uploaded file.</ParamField>
+<ParamField path="onRemove" type="VoidCallback?">Shows a remove button in the uploaded state.</ParamField>
+<ParamField path="errorMessage" type="String?">Displayed below the upload area in red.</ParamField>
+<ParamField path="placeholderText" type="String" default="'Tap to upload'" />
+<ParamField path="uploadedText" type="String" default="'Uploaded!'" />
+<ParamField path="uploadingLabel" type="String" default="'Uploading...'" />
+<ParamField path="isLoading" type="bool" default="false" />
+<ParamField path="icon" type="IconData" default="Icons.upload_file" />

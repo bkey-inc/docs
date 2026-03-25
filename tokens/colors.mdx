@@ -1,0 +1,149 @@
+---
+title: Colors
+description: BMoniColors — the complete BMoni colour palette and semantic token system.
+---
+
+## Overview
+
+`BMoniColors` is a static class that holds every colour token used by the design system. It is organised in two layers:
+
+- **Primitive tokens** — raw hex values (e.g. `brand500`, `grey300`)
+- **Semantic tokens** — purpose-scoped groups that automatically follow light or dark mode
+
+## Usage
+
+```dart
+import 'package:bkey_uikit/bkey_uikit.dart';
+
+// Primitive
+Container(color: BMoniColors.brand500)
+Container(color: BMoniColors.error600)
+
+// Semantic — theme-aware via BuildContext extension
+Container(color: context.colors.bg.greySubtle)
+Text('Label', style: TextStyle(color: context.colors.text.greyDefault))
+```
+
+## Primitive tokens
+
+### Grey scale
+
+| Token | Hex |
+|---|---|
+| `grey25` | `#FAF9FA` |
+| `grey50` | `#F0EFF0` |
+| `grey100` | `#DAD7DA` |
+| `grey200` | `#C2BDC2` |
+| `grey300` | `#A79FA7` |
+| `grey400` | `#857A85` |
+| `grey500` | `#6D646D` |
+| `grey600` | `#554E55` |
+| `grey700` | `#3F393F` |
+| `grey800` | `#2A272A` |
+| `grey900` | `#1A181A` |
+| `grey950` | `#0F0D0F` |
+
+### Brand (purple/magenta)
+
+| Token | Hex |
+|---|---|
+| `brand25` | `#FEF6FE` |
+| `brand100` | `#F4D0FA` |
+| `brand300` | `#DA79E6` |
+| `brand500` | `#B001B0` |
+| `brand600` | `#8C0C8C` |
+| `brand700` | `#690669` |
+| `brand900` | `#2E002E` |
+
+### Accent (blue)
+
+| Token | Hex |
+|---|---|
+| `accent300` | `#4DA0E3` |
+| `accent500` | `#1D6BB9` |
+| `accent700` | `#124177` |
+
+### Semantic states
+
+| Group | Tokens |
+|---|---|
+| Success | `success25` → `success1000` |
+| Warning | `warning25` → `warning950` |
+| Error | `error25` → `error950` |
+
+### Tier colours
+
+| Token | Usage |
+|---|---|
+| `tierBronze` | Bronze tier badge |
+| `tierSilver` | Silver tier badge |
+| `tierGold` | Gold tier badge |
+| `tierPlatinum` | Platinum tier badge |
+
+### Legacy aliases
+
+These are `@deprecated` — prefer the primitive tokens above.
+
+| Alias | Points to |
+|---|---|
+| `BMoniColors.primary` | `brand500` |
+| `BMoniColors.secondary` | `brand600` |
+| `BMoniColors.background` | `offbrand950` |
+| `BMoniColors.error` | `error500` |
+
+---
+
+## Semantic tokens
+
+Semantic tokens are returned by the `context.colors` extension and resolve to the correct primitive based on the current theme brightness.
+
+```dart
+// Available via BuildContext
+context.colors.bg      // BMoniBackgroundColors
+context.colors.border  // BMoniBorderColors
+context.colors.text    // BMoniTextColors
+```
+
+### Background tokens (`bg`)
+
+| Token | Light | Dark |
+|---|---|---|
+| `greyWhite` | `white` | `offbrand950` |
+| `greySubtle` | `grey25` | `offbrand900` |
+| `greyDefault` | `grey50` | `offbrand800` |
+| `greyMuted` | `grey100` | `offbrand700` |
+| `brandSubtle` | `brand25` | `brand950` |
+| `brandSolid` | `brand500` | `brand500` |
+| `successSolid` | `success500` | `success400` |
+| `errorSolid` | `error500` | `error400` |
+
+### Border tokens (`border`)
+
+| Token | Light | Dark |
+|---|---|---|
+| `greySubtle` | `grey100` | `offbrand900` |
+| `greyDefault` | `grey200` | `offbrand800` |
+| `brandDefault` | `brand100` | `brand800` |
+| `brandSolid` | `brand600` | `brand300` |
+
+### Text tokens (`text`)
+
+| Token | Light | Dark |
+|---|---|---|
+| `greyDark` | `grey900` | `grey50` |
+| `greyDefault` | `grey600` | `grey400` |
+| `greyMuted` | `grey300` | `grey600` |
+| `brandDefault` | `brand500` | `brand400` |
+| `errorDefault` | `error500` | `error400` |
+
+---
+
+## Gradients
+
+```dart
+// Splash screen radial gradient
+BMoniGradient.splashGradient
+
+// Welcome screen radial gradient
+BMoniGradient.welcomeGradient
+```

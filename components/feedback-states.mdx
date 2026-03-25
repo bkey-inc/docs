@@ -1,0 +1,127 @@
+---
+title: Feedback states
+description: EmptyState, FailureWidget, InProgressWidget, ProgressLoaderWidget, and InfoCard.
+---
+
+## EmptyState
+
+Centred illustration + message, with an optional action button. Use for lists with no results, first-time states, and filtered views that return nothing.
+
+```dart
+EmptyState(
+  svgAsset: 'assets/svgs/empty_box.svg',
+  message: 'No transactions yet',
+  subtitle: 'Your history will appear here.',
+)
+```
+
+With an action button:
+
+```dart
+EmptyState(
+  svgAsset: 'assets/svgs/empty_friends.svg',
+  message: 'No contacts yet',
+  buttonText: 'Add a contact',
+  onButtonPressed: _openAddContact,
+)
+```
+
+### Props
+
+<ParamField path="svgAsset" type="String" required>Path to the SVG illustration asset.</ParamField>
+<ParamField path="message" type="String" required>Primary message text.</ParamField>
+<ParamField path="subtitle" type="String?">Secondary text below the message.</ParamField>
+<ParamField path="buttonText" type="String?">Label for the optional call-to-action button.</ParamField>
+<ParamField path="onButtonPressed" type="VoidCallback?">Required when `buttonText` is set.</ParamField>
+<ParamField path="imageWidth" type="double?" default="64" />
+<ParamField path="imageHeight" type="double?" default="64" />
+<ParamField path="titleSize" type="BodySize?" default="BodySize.small" />
+<ParamField path="textColor" type="Color?" />
+<ParamField path="backgroundColor" type="Color?" />
+<ParamField path="height" type="double?" />
+
+---
+
+## FailureWidget
+
+Error state card with a warning icon, title, body, optional rejection-reason list, and retry button.
+
+```dart
+FailureWidget(
+  title: 'Verification failed',
+  body: 'We could not verify your identity. Please try again.',
+  rejectionReasons: ['Photo was blurry', 'Name did not match'],
+  onRetryPressed: _retry,
+  buttonText: 'Try again',
+)
+```
+
+<ParamField path="title" type="String" required />
+<ParamField path="body" type="String" required />
+<ParamField path="rejectionReasons" type="List\<String\>" default="[]">Displays a bulleted list inside a red-tinted container.</ParamField>
+<ParamField path="onRetryPressed" type="VoidCallback?" />
+<ParamField path="buttonText" type="String" default="'Try again'" />
+<ParamField path="issuesFoundLabel" type="String" default="'Issues found:'" />
+<ParamField path="backgroundColor" type="Color?" />
+
+---
+
+## InProgressWidget
+
+Pending-state card with an hourglass icon, title, and body. Use while background processes are running.
+
+```dart
+InProgressWidget(
+  title: 'Verification in progress',
+  body: 'This usually takes 1–2 minutes.',
+)
+```
+
+<ParamField path="title" type="String" required />
+<ParamField path="body" type="String" required />
+<ParamField path="backgroundColor" type="Color?" />
+
+---
+
+## ProgressLoaderWidget
+
+A compact circular loading indicator inside a branded container. Drop it inside a modal or blocking overlay.
+
+```dart
+const ProgressLoaderWidget()
+```
+
+No configuration required — it renders a fixed 80 × 80 px container with a `CupertinoActivityIndicator`.
+
+---
+
+## InfoCard
+
+A horizontal card with an icon and a text message. Use for tips, warnings, and inline contextual help.
+
+```dart
+InfoCard(
+  message: 'Transfers can take up to 3 business days.',
+  icon: Icons.info_outline,
+)
+```
+
+With a title:
+
+```dart
+InfoCard(
+  title: 'Daily limit reached',
+  message: 'You have reached your daily transfer limit of \$500.',
+  icon: Icons.warning_amber_rounded,
+  iconColor: BMoniColors.warning400,
+)
+```
+
+<ParamField path="message" type="String" required />
+<ParamField path="title" type="String?" />
+<ParamField path="icon" type="IconData" default="Icons.info" />
+<ParamField path="iconColor" type="Color?">Defaults to `context.colors.bg.warningSolid`.</ParamField>
+<ParamField path="backgroundColor" type="Color?" />
+<ParamField path="child" type="Widget?">When provided, replaces `message` (and `title`) with a fully custom content widget.</ParamField>
+<ParamField path="padding" type="EdgeInsetsGeometry" default="EdgeInsets.symmetric(horizontal: 16, vertical: 12)" />
+<ParamField path="borderRadius" type="BorderRadius?" />

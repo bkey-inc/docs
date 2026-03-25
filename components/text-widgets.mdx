@@ -1,0 +1,144 @@
+---
+title: Text widgets
+description: Typed text widgets that automatically apply the correct BMoni style.
+---
+
+## Overview
+
+Instead of manually applying `BMoniTextStyles` everywhere, use the semantic text widgets. They accept human-readable `size` and `weight` enums and apply the correct `TextStyle` automatically.
+
+```dart
+HeadingText('Section title', level: 3)
+BodyText('Read more about this topic', size: BodySize.small)
+LabelText('Form label', size: LabelSize.large, weight: LabelWeight.medium)
+```
+
+---
+
+## DisplayText
+
+Large decorative text. Levels 1–6 map to D1–D6.
+
+```dart
+DisplayText('Welcome back', level: 5, weight: DisplayWeight.bold)
+```
+
+<ParamField path="text" type="String" required />
+<ParamField path="level" type="int" default="1">1–6 (D1–D6)</ParamField>
+<ParamField path="weight" type="DisplayWeight" default="bold">`regular`, `medium`, `semibold`, `bold`</ParamField>
+<ParamField path="color" type="Color?" />
+<ParamField path="textAlign" type="TextAlign?" />
+<ParamField path="maxLines" type="int?" />
+<ParamField path="overflow" type="TextOverflow?" />
+
+---
+
+## HeadingText
+
+Section and card headings. Levels 1–6 map to H1–H6.
+
+```dart
+HeadingText('Your balance', level: 4, weight: HeadingWeight.semibold)
+```
+
+<ParamField path="text" type="String" required />
+<ParamField path="level" type="int" default="1">1–6 (H1–H6)</ParamField>
+<ParamField path="weight" type="HeadingWeight" default="bold">`semibold` or `bold`</ParamField>
+<ParamField path="color" type="Color?" />
+<ParamField path="textAlign" type="TextAlign?" />
+<ParamField path="maxLines" type="int?" />
+<ParamField path="overflow" type="TextOverflow?" />
+
+---
+
+## BodyText
+
+Paragraph body copy.
+
+```dart
+BodyText('Send money to anyone, instantly.', size: BodySize.medium)
+```
+
+<ParamField path="text" type="String" required />
+<ParamField path="size" type="BodySize" default="medium">`large`, `medium`, `small`, `extraSmall`</ParamField>
+<ParamField path="weight" type="BodyWeight" default="regular">`regular` or `medium`</ParamField>
+<ParamField path="color" type="Color?" />
+<ParamField path="textAlign" type="TextAlign?" />
+<ParamField path="maxLines" type="int?" />
+<ParamField path="overflow" type="TextOverflow?" />
+
+---
+
+## LabelText
+
+UI labels, captions, and form annotations.
+
+```dart
+LabelText('Transaction fee', size: LabelSize.medium, weight: LabelWeight.regular)
+```
+
+<ParamField path="text" type="String" required />
+<ParamField path="size" type="LabelSize" default="medium">`large`, `medium`, `small`, `extraSmall`</ParamField>
+<ParamField path="weight" type="LabelWeight" default="medium">`regular` or `medium`</ParamField>
+<ParamField path="color" type="Color?" />
+<ParamField path="decoration" type="TextDecoration?" />
+<ParamField path="maxLines" type="int?" />
+<ParamField path="overflow" type="TextOverflow?" />
+
+---
+
+## AmountText
+
+Displays a financial amount with an optional currency symbol and configurable decimal places.
+
+```dart
+AmountText(1234.50, currency: '\$', decimalPlaces: 2)
+// Renders: $1234.50
+```
+
+<ParamField path="amount" type="double" required />
+<ParamField path="currency" type="String" default="'$'" />
+<ParamField path="showCurrency" type="bool" default="true" />
+<ParamField path="decimalPlaces" type="int" default="2" />
+<ParamField path="style" type="TextStyle?" />
+<ParamField path="color" type="Color?" />
+
+---
+
+## StatusText
+
+Text with automatic semantic colour based on status type.
+
+```dart
+StatusText('Payment complete', status: StatusType.success)
+StatusText('Action required', status: StatusType.warning)
+```
+
+<ParamField path="text" type="String" required />
+<ParamField path="status" type="StatusType" default="neutral">`success`, `warning`, `error`, `info`, `neutral`</ParamField>
+<ParamField path="style" type="TextStyle?" />
+
+---
+
+## ReadMoreText
+
+A "read more / show less" toggle for long text passages.
+
+```dart
+ReadMoreText(
+  'This is a very long description that will be truncated…',
+  trimLines: 3,
+  trimMode: TrimMode.Line,
+  colorClickableText: BMoniColors.brand400,
+)
+```
+
+<ParamField path="data" type="String" required />
+<ParamField path="trimMode" type="TrimMode" default="Length">`Length` or `Line`</ParamField>
+<ParamField path="trimLength" type="int" default="240">Characters shown before truncation (TrimMode.Length).</ParamField>
+<ParamField path="trimLines" type="int" default="2">Lines shown before truncation (TrimMode.Line).</ParamField>
+<ParamField path="trimCollapsedText" type="String" default="'read more'">Link text when collapsed.</ParamField>
+<ParamField path="trimExpandedText" type="String" default="'show less'">Link text when expanded.</ParamField>
+<ParamField path="colorClickableText" type="Color?" />
+<ParamField path="onExpandChanged" type="void Function(bool)?" />
+<ParamField path="isExpandable" type="bool" default="true">Set to `false` to use `onLinkTap` instead of toggling.</ParamField>

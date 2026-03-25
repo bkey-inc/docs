@@ -1,0 +1,171 @@
+---
+title: Buttons
+description: BMoniButton and UtilityButton — the primary interactive controls.
+---
+
+## BMoniButton
+
+The main button component. Supports four visual variants, five sizes, leading/trailing icons, a loading state, and full colour override.
+
+```dart
+BMoniButton(
+  onPressed: () {},
+  text: 'Confirm',
+)
+```
+
+### Props
+
+<ParamField path="onPressed" type="VoidCallback?" required>
+  Called when the button is tapped. Set to `null` to render a disabled state.
+</ParamField>
+
+<ParamField path="text" type="String" required>
+  The button label.
+</ParamField>
+
+<ParamField path="variant" type="BMoniButtonVariant" default="primary">
+  Visual style. See [Button enums](/enums/index#button-enums).
+</ParamField>
+
+<ParamField path="size" type="BMoniButtonSize" default="medium">
+  Height and padding tier.
+</ParamField>
+
+<ParamField path="isLoading" type="bool" default="false">
+  Shows a `CircularProgressIndicator` and disables the tap target.
+</ParamField>
+
+<ParamField path="isDisabled" type="bool" default="false">
+  Renders the button in a disabled visual state.
+</ParamField>
+
+<ParamField path="icon" type="IconData?">
+  Optional Material icon displayed alongside the label.
+</ParamField>
+
+<ParamField path="iconPosition" type="BMoniButtonIconPosition" default="leading">
+  Whether the icon appears before or after the label.
+</ParamField>
+
+<ParamField path="width" type="double?">
+  Fixed width. Omit to let the button size to its content.
+</ParamField>
+
+<ParamField path="backgroundColor" type="Color?">
+  Overrides the default background for this variant.
+</ParamField>
+
+<ParamField path="foregroundColor" type="Color?">
+  Overrides the default foreground (text + icon) colour.
+</ParamField>
+
+<ParamField path="outlineColor" type="Color?">
+  Overrides the border colour for `outline` variant.
+</ParamField>
+
+<ParamField path="textColor" type="Color?">
+  Overrides the text colour only.
+</ParamField>
+
+### Variants
+
+<Tabs>
+  <Tab title="Primary">
+    ```dart
+    BMoniButton(onPressed: () {}, text: 'Save')
+    // or
+    BMoniButton.primary(onPressed: () {}, text: 'Save')
+    ```
+    Filled with `BMoniColors.brand600`. Use for the main call-to-action.
+  </Tab>
+  <Tab title="Secondary">
+    ```dart
+    BMoniButton.secondary(onPressed: () {}, text: 'Learn more')
+    ```
+    Transparent background, brand-coloured text. Secondary actions.
+  </Tab>
+  <Tab title="Outline">
+    ```dart
+    BMoniButton.outline(onPressed: () {}, text: 'Cancel')
+    ```
+    Bordered button. Use for low-priority or destructive alternatives.
+  </Tab>
+  <Tab title="Ghost">
+    ```dart
+    BMoniButton.ghost(onPressed: () {}, text: 'Skip')
+    ```
+    No background or border. Use for dismissal or skip actions.
+  </Tab>
+</Tabs>
+
+### Sizes
+
+| Size | Height |
+|---|---|
+| `extraSmall` | 32 px |
+| `small` | 40 px |
+| `medium` | 48 px (default) |
+| `large` | 56 px |
+| `custom` | 56 px + extra vertical padding |
+
+### Loading state
+
+```dart
+BMoniButton(
+  onPressed: _submit,
+  text: 'Submitting',
+  isLoading: _isLoading,
+)
+```
+
+When `isLoading` is `true`, the label is replaced with a `CircularProgressIndicator` and taps are blocked.
+
+### Full-width
+
+```dart
+BMoniButton(
+  onPressed: () {},
+  text: 'Continue',
+  width: double.infinity,
+)
+```
+
+---
+
+## UtilityButton
+
+A compact square icon button with a configurable icon, background colour, and border.
+
+```dart
+UtilityButton(
+  onTap: () {},
+  icon: const Icon(Icons.add, color: Colors.white),
+)
+```
+
+### Props
+
+<ParamField path="onTap" type="VoidCallback" required>
+  Callback when the button is tapped.
+</ParamField>
+
+<ParamField path="icon" type="Widget" default="Icon(Icons.add)">
+  Any widget, typically an `Icon`.
+</ParamField>
+
+<ParamField path="size" type="double" default="36.0">
+  Width and height of the square button.
+</ParamField>
+
+<ParamField path="backgroundColor" type="Color" default="BMoniColors.brand600">
+  Fill colour.
+</ParamField>
+
+<ParamField path="outlineColor" type="Color" default="Colors.transparent">
+  Border colour.
+</ParamField>
+
+<ParamField path="borderRadius" type="double" default="8.0">
+  Corner radius.
+</ParamField>

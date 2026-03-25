@@ -1,0 +1,141 @@
+---
+title: Enums
+description: Shared enumerations exported by bkey_uikit.
+---
+
+All enums are available from the single barrel import:
+
+```dart
+import 'package:bkey_uikit/bkey_uikit.dart';
+```
+
+---
+
+## Button enums
+
+### BMoniButtonVariant
+
+Visual style of a `BMoniButton`.
+
+| Value | Description |
+|---|---|
+| `primary` | Filled with `BMoniColors.brand600` |
+| `secondary` | Transparent background, brand-coloured text |
+| `outline` | Transparent with a border |
+| `ghost` | No background, no border |
+
+### BMoniButtonSize
+
+| Value | Height |
+|---|---|
+| `extraSmall` | 32 px |
+| `small` | 40 px |
+| `medium` | 48 px |
+| `large` | 56 px |
+| `custom` | 56 px (extra vertical padding) |
+
+### BMoniButtonIconPosition
+
+| Value | Description |
+|---|---|
+| `leading` | Icon appears before the label |
+| `trailing` | Icon appears after the label |
+
+---
+
+## Text field enums
+
+### BMoniTextFieldVariant
+
+| Value | Description |
+|---|---|
+| `filled` | Dark background (`offbrand950`) |
+| `outlined` | Transparent background with a visible border |
+
+### BMoniTextFieldSize
+
+| Value | Description |
+|---|---|
+| `small` | 12 px vertical padding, `p3` text |
+| `medium` | 16 px vertical padding, `p2` text |
+| `large` | 20 px vertical padding, `p1` text |
+
+### BMoniTextFieldState
+
+Used internally to drive border colours.
+
+| Value | Description |
+|---|---|
+| `normal` | Default border |
+| `focused` | `brand600` 2 px border |
+| `error` | `error500` 2 px border |
+| `disabled` | Dimmed border |
+
+---
+
+## Display enums
+
+Used by the typed text widget helpers.
+
+### DisplayWeight
+
+`regular` · `medium` · `semibold` · `bold`
+
+### HeadingWeight
+
+`semibold` · `bold`
+
+### BodyWeight
+
+`regular` · `medium`
+
+### LabelWeight
+
+`regular` · `medium`
+
+### BodySize
+
+`large` · `medium` · `small` · `extraSmall`
+
+### LabelSize
+
+`large` · `medium` · `small` · `extraSmall`
+
+---
+
+## Status enums
+
+### StatusType
+
+Used by `StatusText` and `InfoCard`.
+
+| Value | Semantic colour |
+|---|---|
+| `success` | Green |
+| `warning` | Orange |
+| `error` | `colorScheme.error` |
+| `info` | `colorScheme.primary` |
+| `neutral` | `colorScheme.onSurface` |
+
+### BMoniToastVariant
+
+| Value | Description |
+|---|---|
+| `default_` | Info-style toast (brand icon) |
+| `warning` | Orange warning toast |
+| `success` | Green success toast |
+| `error` | Red error toast |
+
+### BMoniToastType
+
+| Value | Trailing icon |
+|---|---|
+| `actionable` | Chevron right |
+| `closeable` | ✕ |
+
+### ErrorBottomSheetStyle
+
+| Value | Description |
+|---|---|
+| `standard` | Square icon container |
+| `simple` | Circular icon only |
