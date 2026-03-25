@@ -12,42 +12,44 @@
     "light": "/logo/light.svg"
   },
   "favicon": "/favicon.svg",
-  "navigation": [
-    {
-      "group": "Getting started",
-      "pages": [
-        "index",
-        "getting-started"
-      ]
-    },
-    {
-      "group": "Design tokens",
-      "pages": [
-        "tokens/colors",
-        "tokens/typography",
-        "tokens/theme"
-      ]
-    },
-    {
-      "group": "Components",
-      "pages": [
-        "components/buttons",
-        "components/text-fields",
-        "components/text-widgets",
-        "components/avatars-media",
-        "components/toast",
-        "components/bottom-sheets",
-        "components/feedback-states",
-        "components/misc"
-      ]
-    },
-    {
-      "group": "Enums",
-      "pages": [
-        "enums/index"
-      ]
-    }
-  ],
+  "navigation": {
+    "groups": [
+      {
+        "group": "Getting started",
+        "pages": [
+          "index",
+          "getting-started"
+        ]
+      },
+      {
+        "group": "Design tokens",
+        "pages": [
+          "tokens/colors",
+          "tokens/typography",
+          "tokens/theme"
+        ]
+      },
+      {
+        "group": "Components",
+        "pages": [
+          "components/buttons",
+          "components/text-fields",
+          "components/text-widgets",
+          "components/avatars-media",
+          "components/toast",
+          "components/bottom-sheets",
+          "components/feedback-states",
+          "components/misc"
+        ]
+      },
+      {
+        "group": "Enums",
+        "pages": [
+          "enums/index"
+        ]
+      }
+    ]
+  },
   "footer": {
     "socials": {
       "github": "https://github.com/bkey-inc/bkey_uikit"
