@@ -1,11 +1,11 @@
 ---
 title: Feedback states
-description: EmptyState, FailureWidget, InProgressWidget, ProgressLoaderWidget, and InfoCard.
+description: EmptyState, FailureWidget, InProgressWidget, ProgressLoaderWidget, InfoCard.
 ---
 
 ## EmptyState
 
-Centred illustration + message, with an optional action button. Use for lists with no results, first-time states, and filtered views that return nothing.
+Centred illustration + message with an optional action button.
 
 ```dart
 EmptyState(
@@ -15,9 +15,8 @@ EmptyState(
 )
 ```
 
-With an action button:
-
 ```dart
+// With action
 EmptyState(
   svgAsset: 'assets/svgs/empty_friends.svg',
   message: 'No contacts yet',
@@ -26,49 +25,49 @@ EmptyState(
 )
 ```
 
-### Props
-
-<ParamField path="svgAsset" type="String" required>Path to the SVG illustration asset.</ParamField>
-<ParamField path="message" type="String" required>Primary message text.</ParamField>
-<ParamField path="subtitle" type="String?">Secondary text below the message.</ParamField>
-<ParamField path="buttonText" type="String?">Label for the optional call-to-action button.</ParamField>
-<ParamField path="onButtonPressed" type="VoidCallback?">Required when `buttonText` is set.</ParamField>
-<ParamField path="imageWidth" type="double?" default="64" />
-<ParamField path="imageHeight" type="double?" default="64" />
-<ParamField path="titleSize" type="BodySize?" default="BodySize.small" />
-<ParamField path="textColor" type="Color?" />
-<ParamField path="backgroundColor" type="Color?" />
-<ParamField path="height" type="double?" />
+| Prop | Type | Default |
+|---|---|---|
+| `svgAsset` | `String` | — |
+| `message` | `String` | — |
+| `subtitle` | `String?` | — |
+| `buttonText` | `String?` | — |
+| `onButtonPressed` | `VoidCallback?` | — |
+| `imageWidth` | `double?` | `64` |
+| `imageHeight` | `double?` | `64` |
+| `titleSize` | `BodySize?` | `BodySize.small` |
+| `textColor` | `Color?` | — |
+| `backgroundColor` | `Color?` | — |
+| `height` | `double?` | — |
 
 ---
 
 ## FailureWidget
 
-Error state card with a warning icon, title, body, optional rejection-reason list, and retry button.
+Error card with icon, title, body, optional rejection list, and retry button.
 
 ```dart
 FailureWidget(
   title: 'Verification failed',
-  body: 'We could not verify your identity. Please try again.',
-  rejectionReasons: ['Photo was blurry', 'Name did not match'],
+  body: 'We could not verify your identity.',
+  rejectionReasons: ['Photo was blurry'],
   onRetryPressed: _retry,
-  buttonText: 'Try again',
 )
 ```
 
-<ParamField path="title" type="String" required />
-<ParamField path="body" type="String" required />
-<ParamField path="rejectionReasons" type="List\<String\>" default="[]">Displays a bulleted list inside a red-tinted container.</ParamField>
-<ParamField path="onRetryPressed" type="VoidCallback?" />
-<ParamField path="buttonText" type="String" default="'Try again'" />
-<ParamField path="issuesFoundLabel" type="String" default="'Issues found:'" />
-<ParamField path="backgroundColor" type="Color?" />
+| Prop | Type | Default |
+|---|---|---|
+| `title` | `String` | — |
+| `body` | `String` | — |
+| `rejectionReasons` | `List<String>` | `[]` |
+| `onRetryPressed` | `VoidCallback?` | — |
+| `buttonText` | `String` | `'Try again'` |
+| `issuesFoundLabel` | `String` | `'Issues found:'` |
 
 ---
 
 ## InProgressWidget
 
-Pending-state card with an hourglass icon, title, and body. Use while background processes are running.
+Pending state card with hourglass icon.
 
 ```dart
 InProgressWidget(
@@ -77,51 +76,47 @@ InProgressWidget(
 )
 ```
 
-<ParamField path="title" type="String" required />
-<ParamField path="body" type="String" required />
-<ParamField path="backgroundColor" type="Color?" />
+| Prop | Type |
+|---|---|
+| `title` | `String` |
+| `body` | `String` |
+| `backgroundColor` | `Color?` |
 
 ---
 
 ## ProgressLoaderWidget
 
-A compact circular loading indicator inside a branded container. Drop it inside a modal or blocking overlay.
+Compact circular loading indicator in a branded container.
 
 ```dart
 const ProgressLoaderWidget()
 ```
 
-No configuration required — it renders a fixed 80 × 80 px container with a `CupertinoActivityIndicator`.
+No props. Fixed 80×80 px container with `CupertinoActivityIndicator`.
 
 ---
 
 ## InfoCard
 
-A horizontal card with an icon and a text message. Use for tips, warnings, and inline contextual help.
+Horizontal card with icon and message for tips/warnings.
 
 ```dart
 InfoCard(
   message: 'Transfers can take up to 3 business days.',
-  icon: Icons.info_outline,
 )
-```
 
-With a title:
-
-```dart
 InfoCard(
   title: 'Daily limit reached',
-  message: 'You have reached your daily transfer limit of \$500.',
+  message: 'You have reached your daily limit of $500.',
   icon: Icons.warning_amber_rounded,
-  iconColor: BMoniColors.warning400,
 )
 ```
 
-<ParamField path="message" type="String" required />
-<ParamField path="title" type="String?" />
-<ParamField path="icon" type="IconData" default="Icons.info" />
-<ParamField path="iconColor" type="Color?">Defaults to `context.colors.bg.warningSolid`.</ParamField>
-<ParamField path="backgroundColor" type="Color?" />
-<ParamField path="child" type="Widget?">When provided, replaces `message` (and `title`) with a fully custom content widget.</ParamField>
-<ParamField path="padding" type="EdgeInsetsGeometry" default="EdgeInsets.symmetric(horizontal: 16, vertical: 12)" />
-<ParamField path="borderRadius" type="BorderRadius?" />
+| Prop | Type | Default |
+|---|---|---|
+| `message` | `String` | — |
+| `title` | `String?` | — |
+| `icon` | `IconData` | `Icons.info` |
+| `iconColor` | `Color?` | `bg.warningSolid` |
+| `backgroundColor` | `Color?` | — |
+| `child` | `Widget?` | — |

@@ -9,24 +9,18 @@ description: BKey UI Kit — a shared Flutter design system for all Bkey product
 
 ## What's included
 
-<CardGroup cols={2}>
-  <Card title="Design Tokens" icon="palette" href="/tokens/colors">
-    Full colour palette, semantic light/dark tokens, and typography scale based on *Rethink Sans*.
-  </Card>
-  <Card title="BMoni Theme" icon="brush" href="/tokens/theme">
-    Drop-in `ThemeData` factory that wires the token system into Flutter's Material theme.
-  </Card>
-  <Card title="Components" icon="puzzle-piece" href="/components/buttons">
-    ~30 widgets — buttons, inputs, avatars, toasts, bottom sheets, empty states, loaders, and more.
-  </Card>
-  <Card title="Enums" icon="list" href="/enums/index">
-    Shared enumerations for button variants, text field states, display weights, and status types.
-  </Card>
-</CardGroup>
+| Layer | Contents |
+|---|---|
+| **Design Tokens** | `BMoniColors` — full colour palette + semantic light/dark tokens |
+| | `BMoniTextStyles` — complete type scale (display, heading, body, label) |
+| | `BMoniTheme` — Flutter `ThemeData` factory + `TextTheme` wiring |
+| **Enums** | Button, text-field, display, and status enums shared by all components |
+| **Components** | ~30 widgets — buttons, text fields, avatars, toasts, bottom sheets, empty states, and more |
+| **Fonts** | _Rethink Sans_ (400–800, regular + italic) bundled in `assets/fonts/` |
 
 ## Design principles
 
 - **No app coupling.** Components have zero dependencies on app-level state management, routing, localisation, or services.
-- **Token-driven.** All colours and text styles come from `BMoniColors` and `BMoniTextStyles` — override at the theme level, not in widget code.
-- **Const-first.** Every widget that can use a `const` constructor does so, keeping rebuild costs minimal.
+- **Token-driven.** All colours and text styles come from `BMoniColors` and `BMoniTextStyles`.
+- **Const-first.** Every widget that can use a `const` constructor does so.
 - **Single import.** Everything is exported from `package:bkey_uikit/bkey_uikit.dart`.

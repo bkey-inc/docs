@@ -5,69 +5,57 @@ description: Add bkey_uikit to your Flutter project in three steps.
 
 ## Installation
 
-<Steps>
-  <Step title="Add the dependency">
-    Add `bkey_uikit` to your `pubspec.yaml`.
+### 1. Add the dependency
 
-    **Monorepo / local path:**
+**Monorepo / local path:**
 
-    ```yaml pubspec.yaml
-    dependencies:
-      bkey_uikit:
-        path: ../bkey_uikit
-    ```
+```yaml
+# pubspec.yaml
+dependencies:
+  bkey_uikit:
+    path: ../bkey_uikit
+```
 
-    **Git (private registry):**
+**Git:**
 
-    ```yaml pubspec.yaml
-    dependencies:
-      bkey_uikit:
-        git:
-          url: https://github.com/bkey-inc/bkey_uikit.git
-          ref: main
-    ```
-  </Step>
+```yaml
+# pubspec.yaml
+dependencies:
+  bkey_uikit:
+    git:
+      url: https://github.com/bkey-inc/bkey_uikit.git
+      ref: main
+```
 
-  <Step title="Run pub get">
-    ```bash
-    flutter pub get
-    ```
-  </Step>
+### 2. Run pub get
 
-  <Step title="Apply the theme">
-    Wrap your `MaterialApp` with `BMoniTheme.darkTheme()` to activate the full token system.
+```bash
+flutter pub get
+```
 
-    ```dart main.dart
-    import 'package:bkey_uikit/bkey_uikit.dart';
-    import 'package:flutter/material.dart';
+### 3. Apply the theme
 
-    void main() {
-      runApp(
-        MaterialApp(
-          theme: BMoniTheme.darkTheme(),
-          home: const MyHomePage(),
-        ),
-      );
-    }
-    ```
-  </Step>
-</Steps>
+```dart
+import 'package:bkey_uikit/bkey_uikit.dart';
+import 'package:flutter/material.dart';
 
-## Import
+void main() {
+  runApp(
+    MaterialApp(
+      theme: BMoniTheme.darkTheme(),
+      home: const MyHomePage(),
+    ),
+  );
+}
+```
 
-All public API is available from a single barrel import:
+## Single import
+
+All public API is available from one import:
 
 ```dart
 import 'package:bkey_uikit/bkey_uikit.dart';
 ```
-
-You never need to import from `src/` paths directly.
-
-## Font registration
-
-The package bundles **Rethink Sans** (400–800 weights, regular and italic). Flutter automatically discovers package fonts when `pubspec.yaml` declares them — no additional setup required in the host app.
-
-If you want to override the font, pass a custom `ThemeData` to `BMoniTheme.darkTheme(colorScheme: ...)`.
 
 ## Package structure
 

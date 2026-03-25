@@ -1,83 +1,77 @@
 ---
 title: Misc components
-description: Utility and layout widgets — CustomAppBar, HandBarWidget, UnreadCountBadge, ResponsiveStepper, SwipeableActionRow, ChasingDots, DashedBorderPainter, TierBenefitItem, and CurrencyOption.
+description: CustomAppBar, HandBarWidget, UnreadCountBadge, ResponsiveStepper, SwipeableActionRow, ChasingDots, painters, TierBenefitItem, CurrencyOption.
 ---
 
 ## CustomAppBar
 
-A `PreferredSizeWidget` that wraps Flutter's `AppBar` with BMoni styling — no elevation, transparent background, and support for a back button or close button.
+`PreferredSizeWidget` wrapping Flutter's `AppBar` with BMoni styling.
 
 ```dart
 CustomAppBar(title: 'Settings')
 
-// With a custom leading action
 CustomAppBar(
   title: 'Payment',
   showCloseButton: true,
   backPressed: () => Navigator.pop(context),
-)
-
-// With a custom title widget
-CustomAppBar(
-  titleWidget: Row(children: [avatar, const SizedBox(width: 8), nameText]),
   actions: [IconButton(icon: const Icon(Icons.more_vert), onPressed: _menu)],
 )
 ```
 
-<ParamField path="title" type="String?">Plain string title. Either `title` or `titleWidget` is required.</ParamField>
-<ParamField path="titleWidget" type="Widget?">Custom title widget.</ParamField>
-<ParamField path="showBackButton" type="bool" default="true" />
-<ParamField path="showCloseButton" type="bool" default="false">Shows an ✕ instead of the back arrow.</ParamField>
-<ParamField path="backPressed" type="VoidCallback?">Custom back/close handler. Defaults to `Navigator.maybePop`.</ParamField>
-<ParamField path="actions" type="List\<Widget\>" default="[]" />
-<ParamField path="centerTitle" type="bool" default="true" />
-<ParamField path="backgroundColor" type="Color?" />
+| Prop | Type | Default |
+|---|---|---|
+| `title` | `String?` | — |
+| `titleWidget` | `Widget?` | — |
+| `showBackButton` | `bool` | `true` |
+| `showCloseButton` | `bool` | `false` |
+| `backPressed` | `VoidCallback?` | `Navigator.maybePop` |
+| `actions` | `List<Widget>` | `[]` |
+| `centerTitle` | `bool` | `true` |
+| `backgroundColor` | `Color?` | — |
 
 ---
 
 ## HandBarWidget
 
-The standard drag handle shown at the top of modal bottom sheets.
+Drag handle for bottom sheets.
 
 ```dart
 HandBarWidget(color: BMoniColors.grey600)
 ```
 
-<ParamField path="color" type="Color" required />
-
 ---
 
 ## UnreadCountBadge
 
-A circular badge showing an unread count. Renders `99+` when the count exceeds 99.
+Circular badge. Renders `99+` when count exceeds 99.
 
 ```dart
 UnreadCountBadge(count: 5)
 ```
 
-<ParamField path="count" type="int" required />
-
 ---
 
 ## ResponsiveStepper
 
-A horizontal progress indicator. Fills steps proportionally across the available width.
+Horizontal progress indicator.
 
 ```dart
 ResponsiveStepper(currentStep: 1, totalSteps: 4)
 ```
 
-<ParamField path="currentStep" type="int" required>Zero-based index of the current step.</ParamField>
-<ParamField path="totalSteps" type="int" required />
-<ParamField path="activeColor" type="Color" default="Colors.white" />
-<ParamField path="inactiveColor" type="Color" default="BMoniColor.bgGreyMuted" />
-<ParamField path="height" type="double" default="4.0" />
+| Prop | Type | Default |
+|---|---|---|
+| `currentStep` | `int` | — |
+| `totalSteps` | `int` | — |
+| `activeColor` | `Color` | `Colors.white` |
+| `inactiveColor` | `Color` | `BMoniColor.bgGreyMuted` |
+| `height` | `double` | `4.0` |
 
 ---
 
 ## SwipeableActionRow
 
-A list item that reveals an action button when swiped left. Multiple items sharing the same `openItemId` notifier auto-close when another is opened.
+List item that reveals an action button on left swipe. Multiple items share an `openItemId` notifier — only one is open at a time.
 
 ```dart
 final _openItemId = ValueNotifier<String?>(null);
@@ -93,32 +87,32 @@ SwipeableActionRow(
 )
 ```
 
-<ParamField path="itemId" type="String" required>Unique identifier for this row.</ParamField>
-<ParamField path="openItemId" type="ValueNotifier\<String?\>" required>Shared notifier. Only one row is open at a time.</ParamField>
-<ParamField path="child" type="Widget" required>The row content shown when not swiped.</ParamField>
-<ParamField path="actionWidth" type="double" default="72.0" />
-<ParamField path="actionIcon" type="Widget" default="Icon(Icons.more_horiz)" />
-<ParamField path="actionColor" type="Color" default="Colors.purple" />
-<ParamField path="onActionPressed" type="VoidCallback?" />
-<ParamField path="onTap" type="VoidCallback?" />
+| Prop | Type | Default |
+|---|---|---|
+| `itemId` | `String` | — |
+| `openItemId` | `ValueNotifier<String?>` | — |
+| `child` | `Widget` | — |
+| `actionWidth` | `double` | `72.0` |
+| `actionIcon` | `Widget` | `Icon(Icons.more_horiz)` |
+| `actionColor` | `Color` | `Colors.purple` |
 
 ---
 
 ## ChasingDots
 
-A three-dot animated loading indicator. Useful inside buttons and inline loading states.
+Three-dot animated loading indicator.
 
 ```dart
 const ChasingDots()
 ```
 
-No props — fully self-contained animation.
+No props.
 
 ---
 
 ## DashedBorderPainter / DashedDividerPainter
 
-`CustomPainter` implementations for dashed borders and dividers.
+Custom painters for dashed borders and dividers.
 
 ```dart
 CustomPaint(
@@ -127,12 +121,6 @@ CustomPaint(
     dashWidth: 6,
     dashSpace: 4,
   ),
-  child: content,
-)
-
-CustomPaint(
-  size: const Size(2, double.infinity),
-  painter: DashedDividerPainter(color: BMoniColors.grey700),
 )
 ```
 
@@ -140,32 +128,27 @@ CustomPaint(
 
 ## TierBenefitItem
 
-A single benefit line item used in tier/subscription cards. Shows a check icon, description, and an optional extra label.
+Single benefit line item with check icon.
 
 ```dart
 TierBenefitItem(
   description: 'Free international transfers',
   isCurrentTier: true,
-  isAvailable: true,
-)
-
-TierBenefitItem(
-  description: 'Priority support',
-  isCurrentTier: false,
-  isAvailable: false, // renders in grey
 )
 ```
 
-<ParamField path="description" type="String" required />
-<ParamField path="isCurrentTier" type="bool" required>White text when `true`; grey text when `false`.</ParamField>
-<ParamField path="isAvailable" type="bool" default="true">Dims the item when `false`.</ParamField>
-<ParamField path="extraText" type="String?">Additional label shown after the description (e.g. a tier badge name).</ParamField>
+| Prop | Type | Default |
+|---|---|---|
+| `description` | `String` | — |
+| `isCurrentTier` | `bool` | — |
+| `isAvailable` | `bool` | `true` |
+| `extraText` | `String?` | — |
 
 ---
 
 ## CurrencyOption
 
-A tappable currency row with a flag image, currency code, and a trailing arrow. Used inside currency-selection sheets.
+Tappable currency row with flag, code, and trailing arrow.
 
 ```dart
 CurrencyOption(
@@ -175,6 +158,8 @@ CurrencyOption(
 )
 ```
 
-<ParamField path="currency" type="Map\<String, String\>" required>Must contain `'flag'` (asset path) and `'code'` (display string).</ParamField>
-<ParamField path="isSelected" type="bool" required />
-<ParamField path="onTap" type="VoidCallback" required />
+| Prop | Type |
+|---|---|
+| `currency` | `Map<String, String>` (keys: `'flag'`, `'code'`) |
+| `isSelected` | `bool` |
+| `onTap` | `VoidCallback` |

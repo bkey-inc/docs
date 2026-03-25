@@ -1,11 +1,11 @@
 ---
 title: Text fields
-description: BMoniTextFormField and BMoniTextAreaField — styled input components.
+description: BMoniTextFormField and BMoniTextAreaField.
 ---
 
 ## BMoniTextFormField
 
-A `TextFormField` wrapper that applies BMoni design system styling — filled or outlined, with label, helper, and error text support.
+A `TextFormField` wrapper with BMoni design system styling.
 
 ```dart
 BMoniTextFormField(
@@ -17,84 +17,36 @@ BMoniTextFormField(
 
 ### Props
 
-<ParamField path="label" type="String?">
-  Text label displayed above the input.
-</ParamField>
-
-<ParamField path="hintText" type="String?">
-  Placeholder text shown when the field is empty.
-</ParamField>
-
-<ParamField path="helperText" type="String?">
-  Descriptive text shown below the field when there is no error.
-</ParamField>
-
-<ParamField path="errorText" type="String?">
-  Error message. When set, the border turns red and this text replaces the helper text.
-</ParamField>
-
-<ParamField path="variant" type="BMoniTextFieldVariant" default="filled">
-  `filled` (dark background) or `outlined` (transparent background with border).
-</ParamField>
-
-<ParamField path="size" type="BMoniTextFieldSize" default="medium">
-  Controls padding and text size. `small`, `medium`, or `large`.
-</ParamField>
-
-<ParamField path="prefixIcon" type="Widget?">
-  Widget shown at the start of the input.
-</ParamField>
-
-<ParamField path="prefixText" type="String?">
-  Static text prefix (e.g. currency symbol). Mutually exclusive with `prefixIcon`.
-</ParamField>
-
-<ParamField path="suffixIcon" type="Widget?">
-  Widget shown at the end of the input.
-</ParamField>
-
-<ParamField path="obscureText" type="bool" default="false">
-  Hides the input for passwords.
-</ParamField>
-
-<ParamField path="validator" type="String? Function(String?)?">
-  Standard `FormField` validator.
-</ParamField>
-
-<ParamField path="controller" type="TextEditingController?">
-  External controller for reading or programmatically setting the value.
-</ParamField>
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `label` | `String?` | — | Label above the field. |
+| `hintText` | `String?` | — | Placeholder text. |
+| `helperText` | `String?` | — | Helper text below field. |
+| `errorText` | `String?` | — | Error message (turns border red). |
+| `variant` | `BMoniTextFieldVariant` | `filled` | `filled` or `outlined`. |
+| `size` | `BMoniTextFieldSize` | `medium` | `small`, `medium`, or `large`. |
+| `prefixIcon` | `Widget?` | — | Widget at input start. |
+| `prefixText` | `String?` | — | Static text prefix. |
+| `suffixIcon` | `Widget?` | — | Widget at input end. |
+| `obscureText` | `bool` | `false` | Hide input for passwords. |
+| `controller` | `TextEditingController?` | — | External controller. |
+| `validator` | `String? Function(String?)?` | — | FormField validator. |
 
 ### Convenience constructors
 
 ```dart
-// Filled (default dark background)
+// Filled (dark background)
 BMoniTextFormField.filled(label: 'Name', hintText: 'John Doe')
 
 // Outlined (transparent with border)
-BMoniTextFormField.outlined(label: 'Search', hintText: 'Type to search…')
-```
-
-### Example — with validation
-
-```dart
-BMoniTextFormField(
-  label: 'Amount',
-  prefixText: '\$',
-  keyboardType: const TextInputType.numberWithOptions(decimal: true),
-  validator: (value) {
-    if (value == null || value.isEmpty) return 'Required';
-    if (double.tryParse(value) == null) return 'Invalid number';
-    return null;
-  },
-)
+BMoniTextFormField.outlined(label: 'Search', hintText: 'Type to search...')
 ```
 
 ---
 
 ## BMoniTextAreaField
 
-A multi-line text input with a live grapheme character counter. Handles emoji and multi-codepoint characters correctly.
+Multi-line input with a live grapheme character counter. Handles emoji correctly.
 
 ```dart
 BMoniTextAreaField(
@@ -106,36 +58,12 @@ BMoniTextAreaField(
 )
 ```
 
-### Props
-
-<ParamField path="controller" type="TextEditingController" required>
-  External controller — required to drive the character counter.
-</ParamField>
-
-<ParamField path="label" type="String" default="'Add a note (optional)'">
-  Label shown above the text area.
-</ParamField>
-
-<ParamField path="hintText" type="String" default="'Add a note here'">
-  Placeholder text.
-</ParamField>
-
-<ParamField path="maxLength" type="int" default="60">
-  Maximum number of user-perceived characters (grapheme clusters). The live counter is displayed at the bottom-right of the field.
-</ParamField>
-
-<ParamField path="maxLines" type="int" default="3">
-  Number of visible rows.
-</ParamField>
-
-<ParamField path="readOnly" type="bool" default="false">
-  Prevents editing while keeping the widget fully visible.
-</ParamField>
-
-<ParamField path="onChanged" type="ValueChanged\<String\>?">
-  Called on every character change.
-</ParamField>
-
-<Tip>
-  The character counter uses grapheme cluster counting, so an emoji like 🏳️‍🌈 counts as **1** character, not as multiple code units.
-</Tip>
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `controller` | `TextEditingController` | — | Required. Drives the counter. |
+| `label` | `String` | `'Add a note (optional)'` | Label above field. |
+| `hintText` | `String` | `'Add a note here'` | Placeholder. |
+| `maxLength` | `int` | `60` | Max grapheme clusters. |
+| `maxLines` | `int` | `3` | Visible rows. |
+| `readOnly` | `bool` | `false` | Disable editing. |
+| `onChanged` | `ValueChanged<String>?` | — | Called on change. |

@@ -1,11 +1,11 @@
 ---
 title: Bottom sheets
-description: BMoniBottomSheet, BMoniTitledBottomSheet, BottomSheetHeader, and selector sheets.
+description: BMoniBottomSheet, selectors, and sheet chrome components.
 ---
 
 ## BMoniBottomSheet
 
-A static helper that wraps Flutter's `showModalBottomSheet` with consistent BMoni styling — transparent background, rounded top corners, and theme-aware content colour.
+Static helper wrapping Flutter's `showModalBottomSheet` with BMoni styling.
 
 ```dart
 await BMoniBottomSheet.show(
@@ -14,22 +14,21 @@ await BMoniBottomSheet.show(
 );
 ```
 
-### Props
-
-<ParamField path="context" type="BuildContext" required />
-<ParamField path="child" type="Widget" required />
-<ParamField path="isDismissible" type="bool" default="true" />
-<ParamField path="enableDrag" type="bool" default="true" />
-<ParamField path="height" type="double?">Fixed height. Omit to let the sheet size to its content.</ParamField>
-<ParamField path="isScrollable" type="bool" default="false">Sets `isScrollControlled: true` for sheets that must reach full height.</ParamField>
-<ParamField path="backgroundColor" type="Color?" />
-<ParamField path="constraints" type="BoxConstraints?" />
+| Prop | Type | Default | Description |
+|---|---|---|---|
+| `context` | `BuildContext` | — | — |
+| `child` | `Widget` | — | — |
+| `isDismissible` | `bool` | `true` | — |
+| `enableDrag` | `bool` | `true` | — |
+| `height` | `double?` | — | Fixed height. |
+| `isScrollable` | `bool` | `false` | Sets `isScrollControlled: true`. |
+| `backgroundColor` | `Color?` | — | — |
 
 ---
 
 ## BMoniTitledBottomSheet
 
-A ready-made sheet chrome: drag handle, title, and close button. Drop your content into `children`.
+Ready-made sheet chrome: drag handle, title, and close button.
 
 ```dart
 BMoniBottomSheet.show(
@@ -38,58 +37,52 @@ BMoniBottomSheet.show(
   child: BMoniTitledBottomSheet(
     title: 'Select currency',
     children: [
-      CurrencyOption(currency: usd, isSelected: true, onTap: () {}),
-      CurrencyOption(currency: eur, isSelected: false, onTap: () {}),
+      // your content
     ],
   ),
 );
 ```
 
-<ParamField path="title" type="String" required />
-<ParamField path="children" type="List\<Widget\>" required />
-<ParamField path="onClose" type="VoidCallback?">Custom close handler. Defaults to `Navigator.pop`.</ParamField>
-<ParamField path="padding" type="EdgeInsetsGeometry" default="EdgeInsets.symmetric(horizontal: 17.75, vertical: 16)" />
+| Prop | Type | Default |
+|---|---|---|
+| `title` | `String` | — |
+| `children` | `List<Widget>` | — |
+| `onClose` | `VoidCallback?` | `Navigator.pop` |
 
 ---
 
 ## BMoniOptionsBottomSheet
 
-A pre-built options list sheet. Pass a list of `BMoniBottomSheetOption` items.
+Pre-built options list sheet.
 
 ```dart
-BMoniBottomSheet.show(
-  context: context,
-  child: BMoniOptionsBottomSheet(
-    title: 'More options',
-    options: [
-      BMoniBottomSheetOption(
-        icon: 'assets/svgs/edit.svg',
-        title: 'Edit',
-        onTap: () => Navigator.pop(context, 'edit'),
-      ),
-      BMoniBottomSheetOption(
-        icon: 'assets/svgs/delete.svg',
-        title: 'Delete',
-        onTap: () => Navigator.pop(context, 'delete'),
-      ),
-    ],
-  ),
-);
+BMoniOptionsBottomSheet(
+  title: 'More options',
+  options: [
+    BMoniBottomSheetOption(
+      icon: 'assets/svgs/edit.svg',
+      title: 'Edit',
+      onTap: () => Navigator.pop(context, 'edit'),
+    ),
+  ],
+)
 ```
 
 ### BMoniBottomSheetOption props
 
-<ParamField path="icon" type="String" required>SVG asset path.</ParamField>
-<ParamField path="title" type="String" required />
-<ParamField path="onTap" type="VoidCallback" required />
-<ParamField path="iconColor" type="ColorFilter?" />
-<ParamField path="showDivider" type="bool" default="true" />
+| Prop | Type | Default |
+|---|---|---|
+| `icon` | `String` | — |
+| `title` | `String` | — |
+| `onTap` | `VoidCallback` | — |
+| `iconColor` | `ColorFilter?` | — |
+| `showDivider` | `bool` | `true` |
 
 ---
 
 ## BottomSheetHeader
 
-A minimal header row: title text + close icon. Useful when building custom sheets that don't need the full `BMoniTitledBottomSheet` chrome.
+Minimal header row: title + close icon.
 
 ```dart
 BottomSheetHeader(
@@ -98,54 +91,54 @@ BottomSheetHeader(
 )
 ```
 
-<ParamField path="title" type="String" required />
-<ParamField path="closeIconColor" type="Color" required />
-
 ---
 
 ## SelectorBottomSheet
 
-A scrollable list-picker sheet. Generic over any item type.
+Scrollable list-picker. Generic over any item type.
 
 ```dart
-final result = await showModalBottomSheet<Country>(
-  context: context,
-  builder: (_) => SelectorBottomSheet<Country>(
-    items: availableCountries,
-    label: (c) => c.name,
-    value: (c) => c.id,
-    icon: (c) => c.flagAsset,
-    showIcon: true,
-    title: 'Select country',
-  ),
-);
+SelectorBottomSheet<Country>(
+  items: availableCountries,
+  label: (c) => c.name,
+  value: (c) => c.id,
+  icon: (c) => c.flagAsset,
+  showIcon: true,
+  title: 'Select country',
+)
 ```
 
-<ParamField path="items" type="List\<T\>" required />
-<ParamField path="label" type="String Function(T)" required>Returns the display string for each item.</ParamField>
-<ParamField path="value" type="Object? Function(T)" required>Returns a comparable value for selection state.</ParamField>
-<ParamField path="icon" type="String? Function(T)?" />
-<ParamField path="showIcon" type="bool" default="false" />
-<ParamField path="title" type="String?" />
-<ParamField path="selectOptionLabel" type="String" default="'Select Option'" />
+| Prop | Type | Default |
+|---|---|---|
+| `items` | `List<T>` | — |
+| `label` | `String Function(T)` | — |
+| `value` | `Object? Function(T)` | — |
+| `icon` | `String? Function(T)?` | — |
+| `showIcon` | `bool` | `false` |
+| `title` | `String?` | — |
+| `selectOptionLabel` | `String` | `'Select Option'` |
 
 ---
 
 ## SearchableSelectorBottomSheet
 
-Same as `SelectorBottomSheet` but adds a search text field at the top.
+Same as `SelectorBottomSheet` plus a search field.
 
 ```dart
 SearchableSelectorBottomSheet<Bank>(
   items: banks,
   label: (b) => b.name,
   value: (b) => b.isSelected,
-  searchHint: 'Search banks…',
+  searchHint: 'Search banks...',
   filterFunction: (query, bank) =>
       bank.name.toLowerCase().contains(query.toLowerCase()),
 )
 ```
 
-<ParamField path="searchHint" type="String" required />
-<ParamField path="filterFunction" type="bool Function(String query, T item)" required>Returns `true` when `item` matches the search query.</ParamField>
-<ParamField path="noResultsLabel" type="String" default="'No results found'" />
+Additional props:
+
+| Prop | Type | Default |
+|---|---|---|
+| `searchHint` | `String` | — |
+| `filterFunction` | `bool Function(String, T)` | — |
+| `noResultsLabel` | `String` | `'No results found'` |
