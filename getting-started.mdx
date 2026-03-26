@@ -21,7 +21,7 @@ description: Add bkey_uikit to your Flutter project in three steps.
 # pubspec.yaml
 dependencies:
   bkey_uikit:
-    path: ../bkey_uikit
+    path: ../bkey-packages/bkey_uikit
 ```
 
 **Git (current development branch):**
@@ -65,6 +65,27 @@ All public API is available from one import:
 import 'package:bkey_uikit/bkey_uikit.dart';
 ```
 
+## Using it with feature packages
+
+`bkey_uikit` is the design-system layer. Feature packages should depend on it for
+generic building blocks, then add their own domain-aware composition on top.
+
+Example:
+
+```yaml
+dependencies:
+  bkey_uikit:
+    path: ../bkey-packages/bkey_uikit
+  bmoni_embedded_wallets_cards:
+    path: ../bkey-packages/bmoni_embedded_wallets_cards
+```
+
+In this setup:
+
+- `bkey_uikit` owns tokens and generic widgets
+- `bmoni_embedded_wallets_cards` owns wallet/card-aware widgets and providers
+- the host app owns routing, localisation, analytics, and app-specific actions
+
 ## Package structure
 
 ```
@@ -76,7 +97,7 @@ lib/
       text_styles.dart   ← BMoniTextStyles
       bmoni_theme.dart   ← BMoniTheme
     enums/               ← shared enumerations
-    components/          ← ~30 widget files
+    components/          ← reusable widget and layout primitive files
 assets/
   fonts/                 ← Rethink Sans TTF files
 ```

@@ -12,7 +12,7 @@ description: BKey UI Kit — a shared Flutter design system for all Bkey product
 
 # BKey UI Kit
 
-`bkey_uikit` is a Flutter package that packages the **BMoni design system** into a reusable library — colours, typography, theme, and ~30 production-ready widgets. Any Bkey Flutter app can depend on it and get a consistent look and feel without copying code.
+`bkey_uikit` is a Flutter package that packages the **BMoni design system** into a reusable library — colours, typography, theme, and reusable UI primitives. Any Bkey Flutter app can depend on it and get a consistent look and feel without copying code.
 
 ## What's included
 
@@ -22,8 +22,16 @@ description: BKey UI Kit — a shared Flutter design system for all Bkey product
 | | `BMoniTextStyles` — complete type scale (display, heading, body, label) |
 | | `BMoniTheme` — Flutter `ThemeData` factory + `TextTheme` wiring |
 | **Enums** | Button, text-field, display, and status enums shared by all components |
-| **Components** | ~30 widgets — buttons, text fields, avatars, toasts, bottom sheets, empty states, and more |
+| **Components** | Buttons, text fields, avatars, toasts, bottom sheets, empty states, and layout primitives such as `SectionHeader`, `ActivitySectionCard`, `PageDotsIndicator`, and `BouncingPageViewPhysics` |
 | **Fonts** | _Rethink Sans_ (400–800, regular + italic) bundled in `assets/fonts/` |
+
+## Latest updates
+
+- Added `SectionHeader` for reusable section titles with optional trailing actions
+- Added `ActivitySectionCard` for bordered activity and dashboard sections
+- Added `PageDotsIndicator` for paged UI such as wallet or card carousels
+- Added `BouncingPageViewPhysics` for package-safe page-view bounce behavior
+- Confirmed package boundaries: `bkey_uikit` owns generic UI only; feature-aware composition now lives in packages such as `bmoni_embedded_wallets_cards`
 
 ## Design principles
 

@@ -1,6 +1,6 @@
 ---
 title: Misc components
-description: CustomAppBar, HandBarWidget, UnreadCountBadge, ResponsiveStepper, SwipeableActionRow, ChasingDots, painters, TierBenefitItem, CurrencyOption.
+description: CustomAppBar, HandBarWidget, UnreadCountBadge, ResponsiveStepper, SwipeableActionRow, ChasingDots, painters, TierBenefitItem, CurrencyOption, SectionHeader, ActivitySectionCard, PageDotsIndicator, BouncingPageViewPhysics.
 ---
 
 ## CustomAppBar
@@ -163,3 +163,91 @@ CurrencyOption(
 | `currency` | `Map<String, String>` (keys: `'flag'`, `'code'`) |
 | `isSelected` | `bool` |
 | `onTap` | `VoidCallback` |
+
+---
+
+## SectionHeader
+
+Reusable section title row with an optional trailing action and divider.
+
+```dart
+SectionHeader(
+  title: 'Recent activity',
+  trailing: GestureDetector(
+    onTap: () {},
+    child: const Text('View all'),
+  ),
+)
+```
+
+| Prop | Type | Default |
+|---|---|---|
+| `title` | `String` | — |
+| `trailing` | `Widget?` | — |
+| `padding` | `EdgeInsetsGeometry` | `EdgeInsets.symmetric(horizontal: 16, vertical: 24)` |
+| `showBottomDivider` | `bool` | `true` |
+| `backgroundColor` | `Color?` | `context.colors.bg.greyWhite` |
+| `titleStyle` | `TextStyle?` | `BMoniTextStyles.p3Medium` |
+
+---
+
+## ActivitySectionCard
+
+Bordered section wrapper with `header`, `child`, and `footer` slots.
+
+```dart
+ActivitySectionCard(
+  header: const SectionHeader(title: 'Recent activity'),
+  child: const Padding(
+    padding: EdgeInsets.all(16),
+    child: Text('Body'),
+  ),
+)
+```
+
+| Prop | Type | Default |
+|---|---|---|
+| `child` | `Widget` | — |
+| `header` | `Widget?` | — |
+| `footer` | `Widget?` | — |
+| `backgroundColor` | `Color?` | `context.colors.bg.greyWhite` |
+| `borderColor` | `Color?` | `context.colors.border.greyDefault` |
+| `borderWidth` | `double` | `2` |
+| `borderRadius` | `BorderRadius` | `BorderRadius.all(Radius.circular(16))` |
+
+---
+
+## PageDotsIndicator
+
+Compact dots indicator for paged UI with an optional caption.
+
+```dart
+const PageDotsIndicator(
+  pageCount: 3,
+  currentPage: 1,
+  caption: 'Swipe',
+)
+```
+
+| Prop | Type | Default |
+|---|---|---|
+| `pageCount` | `int` | — |
+| `currentPage` | `int` | — |
+| `caption` | `String?` | — |
+| `activeColor` | `Color?` | `Colors.white` |
+| `inactiveColor` | `Color?` | `Colors.white.withValues(alpha: 0.3)` |
+
+---
+
+## BouncingPageViewPhysics
+
+Page-view scroll physics that preserve bounce feedback at the boundaries.
+
+```dart
+PageView(
+  physics: const BouncingPageViewPhysics(),
+  children: const [Placeholder(), Placeholder()],
+)
+```
+
+No props beyond the inherited `ScrollPhysics.parent`.
