@@ -89,7 +89,7 @@ Completes a Monerium order by submitting the signed order message to the place-o
 POST /monerium/orders/prepare
 ```
 
-Starts a place-order workflow and returns workflowId and messageToSign. If international payout fee applies, signatureRequest is included for the fee child workflow. Sign the order message with the wallet specified by walletId, then POST to /monerium/orders/complete with { workflowId, signature }.
+Starts a place-order workflow and returns `workflowId` and `messageToSign`. If an international payout fee applies, `signatureRequest` is included for the fee child workflow. Sign the order message with the wallet specified by `walletId`, then `POST /monerium/orders/complete` with `workflowId` and `signature`.
 
 
 **Request body**
