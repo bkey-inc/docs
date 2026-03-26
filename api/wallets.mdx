@@ -1,0 +1,443 @@
+---
+title: Wallets API
+description: Create and manage multi-currency wallets on the BMoni platform.
+---
+
+<Warning>
+  The BMoni API is currently in **active development**. Endpoints, request
+  shapes, and response formats are subject to change without notice. Do not rely
+  on this reference for production integrations until a stable release is
+  announced.
+</Warning>
+
+## Overview
+
+Wallets are the core financial primitive in BMoni. Each wallet holds a single
+currency balance and is tied to a user's externally-owned blockchain address
+(EOA). A user can hold multiple wallets across different supported currencies.
+
+All wallet endpoints are authenticated. Include your bearer token in the
+`Authorization` header.
+
+### Supported currencies
+
+| Code  | Currency        |
+| ----- | --------------- |
+| `USD` | US Dollar       |
+| `NGN` | Nigerian Naira  |
+| `CAD` | Canadian Dollar |
+| `EUR` | Euro            |
+| `GBP` | British Pound   |
+| `MXN` | Mexican Peso    |
+
+---
+
+## Wallet endpoints (v1)
+
+### Create wallet
+
+```http
+POST /wallet/v1/wallets
+```
+
+Creates a new wallet after verifying the caller owns the provided blockchain
+address. No KYC is required at creation time — fund and withdraw rails are
+activated separately through the onboarding flow.
+
+**Request body**
+
+| Field           | Type      | Required | Description                                                                                       |
+| --------------- | --------- | -------- | ------------------------------------------------------------------------------------------------- |
+| `walletAddress` | `string`  | Yes      | Externally owned address (EOA) that will control this wallet                                      |
+| `walletIndex`   | `integer` | Yes      | Non-negative integer index for the wallet (used for HD derivation)                                |
+| `currency`      | `string`  | Yes      | Wallet currency — one of `USD`, `NGN`, `CAD`, `EUR`, `GBP`, `MXN`                                |
+| `signature`     | `string`  | Yes      | Hex signature (0x-prefixed) of the exact message: _"I hereby declare that I am the address owner."_ |
+| `colorCode`     | `string`  | No       | Wallet display colour as a hex string (e.g. `#FF5733`). Defaults to `#1D6BB9`                    |
+
+**Response**
+
+| Field           | Type      | Description                                   |
+| --------------- | --------- | --------------------------------------------- |
+| `walletId`      | `string`  | Unique ID of the created wallet               |
+| `walletAddress` | `string`  | The original EOA address                      |
+| `walletIndex`   | `number`  | Wallet index                                  |
+| `currency`      | `string`  | Wallet currency                               |
+| `colorCode`     | `string`  | Wallet colour code (hex)                      |
+| `isDefault`     | `boolean` | Whether this is the user's default wallet     |
+| `canFund`       | `boolean` | Whether fiat funding is enabled (always false at creation) |
+| `canWithdraw`   | `boolean` | Whether fiat withdrawal is enabled (always false at creation) |
+
+**Example request**
+
+```json
+{
+  "walletAddress": "0xAbC123...",
+  "walletIndex": 0,
+  "currency": "NGN",
+  "signature": "0x4a2b...",
+  "colorCode": "#7C3AED"
+}
+```
+
+---
+
+### List wallets
+
+```http
+GET /wallet/v1/wallets
+```
+
+Returns all wallets belonging to the authenticated user. Optionally filter by
+currency.
+
+**Query parameters**
+
+| Parameter  | Type     | Required | Description                                    |
+| ---------- | -------- | -------- | ---------------------------------------------- |
+| `currency` | `string` | No       | Filter results to a specific currency code     |
+
+**Response**
+
+| Field     | Type     | Description                      |
+| --------- | -------- | -------------------------------- |
+| `wallets` | `array`  | Array of wallet objects          |
+| `count`   | `number` | Total number of wallets returned |
+
+Each wallet object in the array contains:
+
+| Field         | Type      | Description                               |
+| ------------- | --------- | ----------------------------------------- |
+| `walletId`    | `string`  | Wallet ID                                 |
+| `walletIndex` | `number`  | Wallet index                              |
+| `name`        | `string`  | Wallet name (nullable)                    |
+| `description` | `string`  | Wallet description (nullable)             |
+| `currency`    | `string`  | Currency code                             |
+| `colorCode`   | `string`  | Display colour (hex)                      |
+| `isDefault`   | `boolean` | Whether this is the user's default wallet |
+| `createdAt`   | `string`  | ISO 8601 creation timestamp               |
+
+---
+
+### Get wallet details
+
+```http
+GET /wallet/v1/wallet/{walletId}
+```
+
+Returns details for a specific wallet owned by the authenticated user.
+
+**Path parameters**
+
+| Parameter  | Type     | Description     |
+| ---------- | -------- | --------------- |
+| `walletId` | `string` | Target wallet ID |
+
+**Response**
+
+| Field         | Type     | Description               |
+| ------------- | -------- | ------------------------- |
+| `walletIndex` | `number` | Wallet index              |
+| `currency`    | `string` | Currency code             |
+| `name`        | `string` | Wallet name (optional)    |
+| `description` | `string` | Description (optional)    |
+
+---
+
+### Get wallet balance
+
+```http
+GET /wallet/v1/balance/{walletId}
+```
+
+Returns the current on-chain balance for a specific wallet.
+
+**Path parameters**
+
+| Parameter  | Type     | Description      |
+| ---------- | -------- | ---------------- |
+| `walletId` | `string` | Target wallet ID |
+
+**Response**
+
+| Field      | Type     | Description                               |
+| ---------- | -------- | ----------------------------------------- |
+| `balance`  | `string` | Balance as a string (preserved precision) |
+| `currency` | `string` | Currency code                             |
+| `walletId` | `string` | The wallet ID                             |
+
+---
+
+### Update wallet colour
+
+```http
+PATCH /wallet/v1/wallets/{id}/color
+```
+
+Updates the display colour of a wallet.
+
+**Path parameters**
+
+| Parameter | Type     | Description      |
+| --------- | -------- | ---------------- |
+| `id`      | `string` | Target wallet ID |
+
+**Request body**
+
+| Field       | Type     | Required | Description                                                                |
+| ----------- | -------- | -------- | -------------------------------------------------------------------------- |
+| `colorCode` | `string` | Yes      | Valid hex colour string (e.g. `#F33`, `#FF5733`, `#FF5733AA`) |
+
+---
+
+### Set default wallet
+
+```http
+PATCH /wallet/v1/wallets/{id}/default
+```
+
+Marks a wallet as the user's default wallet for the associated currency.
+
+**Path parameters**
+
+| Parameter | Type     | Description      |
+| --------- | -------- | ---------------- |
+| `id`      | `string` | Target wallet ID |
+
+**Response**
+
+| Field      | Type              | Description                      |
+| ---------- | ----------------- | -------------------------------- |
+| `walletId` | `string`          | The wallet ID                    |
+| `isDefault`| `true` (literal)  | Confirms the wallet is now default |
+
+---
+
+### Transfer between wallets (same currency)
+
+```http
+POST /wallet/v1/transfer
+```
+
+Initiates a transfer between two same-currency wallets. Returns a signature
+request that the client must sign before the transaction is submitted
+on-chain.
+
+**Request body**
+
+| Field          | Type     | Required | Description               |
+| -------------- | -------- | -------- | ------------------------- |
+| `fromWalletId` | `string` | Yes      | Source wallet ID          |
+| `toWalletId`   | `string` | Yes      | Destination wallet ID     |
+| `amount`       | `string` | Yes      | Amount to transfer        |
+
+**Response** — [Signature Request](#signature-request-object)
+
+---
+
+### Send to another user
+
+```http
+POST /wallet/v1/send
+```
+
+Sends funds from a wallet to another user. Returns a signature request.
+
+**Request body**
+
+| Field          | Type     | Required | Description                       |
+| -------------- | -------- | -------- | --------------------------------- |
+| `fromWalletId` | `string` | Yes      | Sender wallet ID                  |
+| `toUserId`     | `string` | Yes      | Recipient's user ID               |
+| `amount`       | `number` | Yes      | Positive amount to send           |
+
+---
+
+### Create swap quote (v1)
+
+```http
+POST /wallet/v1/swap
+```
+
+Creates an exact-in swap quote between two wallets of different currencies.
+Returns a signature request along with the exchange rate quote.
+
+**Request body**
+
+| Field          | Type     | Required | Description                                  |
+| -------------- | -------- | -------- | -------------------------------------------- |
+| `fromWalletId` | `string` | Yes      | Source wallet ID                             |
+| `toWalletId`   | `string` | Yes      | Destination wallet ID                        |
+| `amountIn`     | `string` | Yes      | Amount to swap from the source wallet        |
+
+**Response** — [Signature Request](#signature-request-object) + [Quote](#quote-object)
+
+---
+
+### Get exchange rate
+
+```http
+GET /wallet/v1/exchange-rate/{fromCurrency}/{toCurrency}
+```
+
+Returns the current exchange rate between two currencies.
+
+**Path parameters**
+
+| Parameter      | Type     | Description               |
+| -------------- | -------- | ------------------------- |
+| `fromCurrency` | `string` | Currency to convert from  |
+| `toCurrency`   | `string` | Currency to convert to    |
+
+Supported currencies for quotes include all wallet currencies plus `CNY`.
+
+**Response**
+
+| Field          | Type     | Description            |
+| -------------- | -------- | ---------------------- |
+| `exchangeRate` | `string` | Current exchange rate  |
+
+---
+
+### Submit signature
+
+```http
+POST /wallet/v1/submit-signature
+```
+
+Submits a signed payload for a pending workflow (transfer, send, swap, or card
+creation). The workflow automatically advances after a valid signature is
+received.
+
+**Request body**
+
+| Field        | Type     | Required | Description                          |
+| ------------ | -------- | -------- | ------------------------------------ |
+| `workflowId` | `string` | Yes      | ID of the workflow awaiting signing  |
+| `signature`  | `string` | Yes      | Signed hash from the signature request |
+
+**Response**
+
+| Field     | Type      | Description                     |
+| --------- | --------- | ------------------------------- |
+| `success` | `boolean` | Whether the signature was accepted |
+| `message` | `string`  | Optional confirmation message   |
+
+---
+
+## Wallet endpoints (v2)
+
+V2 endpoints extend the v1 behaviour with cross-currency support and richer
+quote responses.
+
+### Send to another user (v2)
+
+```http
+POST /wallet/v2/send
+```
+
+Sends funds from a wallet to another user. Automatically handles
+cross-currency conversion when the sender and receiver hold different
+currencies.
+
+**Request body**
+
+| Field          | Type     | Required | Description                          |
+| -------------- | -------- | -------- | ------------------------------------ |
+| `fromWalletId` | `string` | Yes      | Sender wallet ID                     |
+| `toUserId`     | `string` | Yes      | Recipient's user ID                  |
+| `amount`       | `string` | Yes      | Amount to send                       |
+| `note`         | `string` | No       | Optional note (max 500 characters)   |
+
+**Response**
+
+| Field              | Type     | Description                                                      |
+| ------------------ | -------- | ---------------------------------------------------------------- |
+| `signatureRequest` | `object` | [Signature Request](#signature-request-object) to sign          |
+| `quote`            | `object` | [Quote](#quote-object) — present only for cross-currency sends  |
+
+---
+
+### Swap between wallets (v2)
+
+```http
+POST /wallet/v2/swap
+```
+
+Swaps currencies between the authenticated user's own wallets. Supports both
+`exactIn` (specify input amount) and `exactOut` (specify desired output) modes.
+
+**Request body**
+
+| Field          | Type     | Required | Description               |
+| -------------- | -------- | -------- | ------------------------- |
+| `fromWalletId` | `string` | Yes      | Source wallet ID          |
+| `toWalletId`   | `string` | Yes      | Destination wallet ID     |
+| `swapAmount`   | `object` | Yes      | Swap amount specification |
+
+`swapAmount` is a discriminated union:
+
+**exactIn mode**
+
+```json
+{
+  "type": "exactIn",
+  "amountIn": "100.00"
+}
+```
+
+**exactOut mode**
+
+```json
+{
+  "type": "exactOut",
+  "amountOut": "50.00"
+}
+```
+
+**Response**
+
+| Field              | Type     | Description                                         |
+| ------------------ | -------- | --------------------------------------------------- |
+| `signatureRequest` | `object` | [Signature Request](#signature-request-object)      |
+| `quote`            | `object` | [Quote](#quote-object) with exchange rate details   |
+
+---
+
+## Shared objects
+
+### Signature request object
+
+Returned by transfer, send, swap, and card-creation endpoints. The client
+must sign the `hashToSign` with the wallet at `walletIndex` and submit the
+result via [Submit Signature](#submit-signature).
+
+| Field         | Type     | Description                                     |
+| ------------- | -------- | ----------------------------------------------- |
+| `method`      | `string` | Blockchain chain — `evm` or `solana`            |
+| `walletIndex` | `number` | HD wallet index to sign with                    |
+| `workflowId`  | `string` | Workflow ID to reference when submitting        |
+| `hashToSign`  | `string` | The hash the client must sign                   |
+| `payload`     | `string` | Full encoded transaction payload                |
+| `deadline`    | `string` | ISO 8601 timestamp — signature expires after this |
+
+### Quote object
+
+Present on swap and cross-currency send responses.
+
+| Field               | Type     | Description                          |
+| ------------------- | -------- | ------------------------------------ |
+| `fromCurrency`      | `string` | Source currency code                 |
+| `toCurrency`        | `string` | Destination currency code            |
+| `amountIn`          | `string` | Amount being swapped                 |
+| `amountOut`         | `string` | Amount to be received                |
+| `exchangeRate`      | `string` | Exchange rate applied                |
+| `toUsdExchangeRate` | `string` | Equivalent exchange rate to USD      |
+| `fees`              | `array`  | Array of fee objects (see below)     |
+
+Each fee object:
+
+| Field         | Type     | Description              |
+| ------------- | -------- | ------------------------ |
+| `currency`    | `string` | Currency the fee is in   |
+| `amount`      | `string` | Fee amount               |
+| `description` | `string` | Human-readable label (optional) |

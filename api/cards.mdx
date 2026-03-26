@@ -1,0 +1,178 @@
+---
+title: Cards API
+description: Issue and manage virtual and physical cards backed by BMoni wallets.
+---
+
+<Warning>
+  The BMoni API is currently in **active development**. Endpoints, request
+  shapes, and response formats are subject to change without notice. Do not rely
+  on this reference for production integrations until a stable release is
+  announced.
+</Warning>
+
+## Overview
+
+Cards allow users to spend wallet balances via virtual or physical Visa/Mastercard
+instruments. Card creation charges an on-chain fee from the user's wallet before
+the card is provisioned through the underlying card service.
+
+The creation flow is asynchronous and signature-gated:
+
+1. Call `POST /api/cards` → receive a [Signature Request](/api/wallets#signature-request-object) and a `workflowId`.
+2. Sign the `hashToSign` with the wallet at `walletIndex`.
+3. Submit the signature via [`POST /wallet/v1/submit-signature`](/api/wallets#submit-signature).
+4. The workflow automatically charges the fee on-chain and provisions the card.
+
+All card endpoints are authenticated. Include your bearer token in the
+`Authorization` header.
+
+---
+
+## Endpoints
+
+### Create a card
+
+```http
+POST /api/cards
+```
+
+Initiates card creation by charging the creation fee on-chain. Returns a
+signature request. After the signature is submitted, the card is created
+automatically through the card service.
+
+**Request body**
+
+| Field             | Type     | Required | Description                                                                     |
+| ----------------- | -------- | -------- | ------------------------------------------------------------------------------- |
+| `cardName`        | `string` | Yes      | Display name for the card (1–50 characters)                                     |
+| `cardColor`       | `string` | Yes      | Card display colour as a valid hex string (e.g. `#FF5733` or `#FFF`)           |
+| `currency`        | `string` | Yes      | Currency of the card — `NGN` or `USD`                                           |
+| `type`            | `string` | Yes      | Card type — `virtual` or `physical`                                             |
+| `walletId`        | `string` | Yes      | ID of the wallet that will pay the creation fee and fund the card               |
+| `nin`             | `string` | No       | National Identification Number (required for some card programmes)              |
+| `ninIssueDate`    | `string` | No       | NIN issue date                                                                  |
+| `ninExpiryDate`   | `string` | No       | NIN expiry date                                                                 |
+| `deliveryAddress` | `string` | No       | Delivery address — required when `type` is `physical`                           |
+
+**Supported currencies**
+
+| Code  | Description     |
+| ----- | --------------- |
+| `NGN` | Nigerian Naira  |
+| `USD` | US Dollar       |
+
+**Card types**
+
+| Value      | Description                                          |
+| ---------- | ---------------------------------------------------- |
+| `virtual`  | Instant digital card for online and in-app payments  |
+| `physical` | Plastic card shipped to a delivery address           |
+
+**Response**
+
+| Field              | Type     | Description                                                               |
+| ------------------ | -------- | ------------------------------------------------------------------------- |
+| `signatureRequest` | `object` | [Signature Request](/api/wallets#signature-request-object) — sign and submit to proceed |
+| `feeAmount`        | `string` | Creation fee amount that will be charged on-chain                         |
+| `feeCurrency`      | `string` | Currency the fee is denominated in                                        |
+| `workflowId`       | `string` | Workflow ID — use this to track card creation status                      |
+
+**Example request**
+
+```json
+{
+  "cardName": "My Travel Card",
+  "cardColor": "#7C3AED",
+  "currency": "USD",
+  "type": "virtual",
+  "walletId": "wlt_abc123"
+}
+```
+
+**Example response**
+
+```json
+{
+  "ok": true,
+  "value": {
+    "signatureRequest": {
+      "method": "evm",
+      "walletIndex": 0,
+      "workflowId": "wf_xyz789",
+      "hashToSign": "0x1a2b...",
+      "payload": "0x...",
+      "deadline": "2026-03-26T12:00:00Z"
+    },
+    "feeAmount": "2.50",
+    "feeCurrency": "USD",
+    "workflowId": "wf_xyz789"
+  }
+}
+```
+
+---
+
+## Card creation flow
+
+```
+Client                          BMoni API              Card Service
+  │                                 │                       │
+  │  POST /api/cards                │                       │
+  │────────────────────────────────>│                       │
+  │                                 │                       │
+  │  { signatureRequest, workflowId }                       │
+  │<────────────────────────────────│                       │
+  │                                 │                       │
+  │  Sign hashToSign with wallet key│                       │
+  │                                 │                       │
+  │  POST /wallet/v1/submit-signature                       │
+  │────────────────────────────────>│                       │
+  │                                 │  Submit fee tx        │
+  │                                 │──────────────────────>│
+  │                                 │  Create card          │
+  │                                 │──────────────────────>│
+  │                                 │                       │
+  │  { success: true }              │                       │
+  │<────────────────────────────────│                       │
+```
+
+After `submit-signature` returns `success: true`, the card provisioning
+workflow runs in the background. Poll your card status endpoint (when
+available) or listen for a push notification to confirm the card is ready.
+
+---
+
+## Error handling
+
+All API responses follow a consistent result envelope:
+
+**Success**
+
+```json
+{
+  "ok": true,
+  "value": { ... }
+}
+```
+
+**Failure**
+
+```json
+{
+  "ok": false,
+  "error": {
+    "type": "VALIDATION_ERROR",
+    "message": "Wallet ID is required"
+  }
+}
+```
+
+Common error types for card endpoints:
+
+| Error type          | Description                                        |
+| ------------------- | -------------------------------------------------- |
+| `VALIDATION_ERROR`  | Missing or invalid request fields                  |
+| `INSUFFICIENT_FUNDS`| Wallet balance too low to cover the creation fee   |
+| `WALLET_NOT_FOUND`  | The specified wallet ID does not exist             |
+| `CARD_SERVICE_ERROR`| Downstream card service returned an error         |
+| `WORKFLOW_ERROR`    | On-chain fee submission failed                     |

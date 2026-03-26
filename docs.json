@@ -47,6 +47,13 @@
         "pages": [
           "enums/index"
         ]
+      },
+      {
+        "group": "API Reference",
+        "pages": [
+          "api/wallets",
+          "api/cards"
+        ]
       }
     ]
   },
