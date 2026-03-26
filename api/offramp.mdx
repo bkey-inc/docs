@@ -244,7 +244,7 @@ Prerequisites:
 POST /offramp/china-ngn/create-and-submit
 ```
 
-Creates a China NGN/CNY offramp using a saved RMB receiver. Pass `receiverId` (format: `rmb_{uuid}`, obtained from `POST /conduit/counterparties/receiver` with `destinationCurrency: RMB`). Beneficiary details are loaded from the receiver; no need to send account name, bank, or phone. Requires 1–5 invoice files (JPEG, PNG, or PDF). Returns a signature request for the on-chain transfer.
+Creates a China NGN/CNY offramp using a saved RMB receiver. Pass receiverId (rmb_`uuid` from POST /conduit/counterparties/receiver with destinationCurrency: RMB). Beneficiary details are loaded from the receiver; no need to send account name, bank, or phone. Requires 1-5 invoice files (JPEG, PNG, or PDF). Returns a signature request for the on-chain transfer.
 
 
 **Response**
