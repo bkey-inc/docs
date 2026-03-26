@@ -39,7 +39,8 @@
           "components/toast",
           "components/bottom-sheets",
           "components/feedback-states",
-          "components/misc"
+          "components/misc",
+          "components/wallet-card-layouts"
         ]
       },
       {

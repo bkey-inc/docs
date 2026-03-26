@@ -1,0 +1,98 @@
+---
+title: Wallet & card layouts
+description: Generic wallet- and card-style layout primitives in bkey_uikit, plus where full wallet card UI lives.
+---
+
+This page exists to make one package boundary explicit:
+
+- `bkey_uikit` documents the **generic UI primitives**
+- `bmoni_embedded_wallets_cards` owns the **wallet/card-aware composed widgets, models, and providers**
+
+If you are looking for full wallet card UI, transaction sections, or embedded wallet flows, start here first and then jump to the embedded package.
+
+## Where wallet cards live
+
+`bkey_uikit` does **not** own the full `WalletCard` feature widget from `bmoni-mobile`.
+
+Instead, it provides the visual building blocks that wallet- and card-aware packages compose:
+
+- `PageDotsIndicator`
+- `BouncingPageViewPhysics`
+- `SectionHeader`
+- `ActivitySectionCard`
+
+The feature-aware layer currently lives in `bmoni_embedded_wallets_cards`, which builds on top of these primitives.
+
+## Generic primitives in `bkey_uikit`
+
+### PageDotsIndicator
+
+Use this for wallet or card carousels where the host or feature package owns the actual page content.
+
+```dart
+const PageDotsIndicator(
+  pageCount: 3,
+  currentPage: 1,
+  caption: 'Swipe',
+)
+```
+
+### BouncingPageViewPhysics
+
+Use this when you want page-view bounce behavior without embedding wallet logic into the UI kit.
+
+```dart
+PageView(
+  physics: const BouncingPageViewPhysics(),
+  children: const [Placeholder(), Placeholder()],
+)
+```
+
+### SectionHeader
+
+Use this for titled wallet/card sections with optional actions like “View all”.
+
+```dart
+SectionHeader(
+  title: 'Recent activity',
+  trailing: GestureDetector(
+    onTap: () {},
+    child: const Text('View all'),
+  ),
+)
+```
+
+### ActivitySectionCard
+
+Use this as the bordered shell for sections such as recent transactions, wallet activity, or card activity.
+
+```dart
+ActivitySectionCard(
+  header: const SectionHeader(title: 'Recent activity'),
+  child: const Padding(
+    padding: EdgeInsets.all(16),
+    child: Text('Section body'),
+  ),
+)
+```
+
+## Feature-aware composition
+
+The wallet-aware package composes these primitives into widgets such as:
+
+- embedded wallet transaction sections
+- wallet-aware carousel surfaces
+- feature-specific overview sections
+
+That package is documented in its repository README:
+
+- [`bmoni_embedded_wallets_cards` on GitHub](https://github.com/bkey-inc/bmoni_embedded_wallets_cards)
+
+## Backend APIs vs Flutter UI
+
+If you are looking for HTTP endpoints, use:
+
+- [REST API: Wallets](/api/wallets)
+- [REST API: Cards](/api/cards)
+
+Those pages describe backend contracts, not Flutter UI components.

@@ -33,6 +33,14 @@ description: BKey UI Kit — a shared Flutter design system for all Bkey product
 - Added `BouncingPageViewPhysics` for package-safe page-view bounce behavior
 - Confirmed package boundaries: `bkey_uikit` owns generic UI only; feature-aware composition now lives in packages such as `bmoni_embedded_wallets_cards`
 
+## Looking for wallet cards?
+
+If you are trying to find the wallet/card UI layer:
+
+- generic wallet/card layout primitives are documented under [Wallet & card layouts](/components/wallet-card-layouts)
+- full wallet/card-aware composition lives in `bmoni_embedded_wallets_cards`
+- backend HTTP endpoints are documented separately under [REST API: Wallets](/api/wallets) and [REST API: Cards](/api/cards)
+
 ## Design principles
 
 - **No app coupling.** Components have zero dependencies on app-level state management, routing, localisation, or services.
