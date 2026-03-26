@@ -1,0 +1,465 @@
+---
+title: Conversations
+description: Direct messages, group chats, video calls, and image media.
+---
+
+<Warning>
+  The BKey API is in **active development**. Endpoints and schemas may change without notice.
+</Warning>
+
+
+## Conversations
+
+### Send image message to a channel
+
+```http
+POST /conversations/channels/{channelId}/messages/image
+```
+
+Uploads a chat attachment (image, video, or document) to S3 and sends it to the specified Stream channel.
+
+
+**Path parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `channelId` | `string` | Yes |  |
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `sent` | `boolean` | Whether the message was sent |
+| `channelId` | `string` | Target channel ID |
+| `channelType` | `messaging \| team` | Resolved Stream channel type |
+| `messageId` | `string` | Created Stream message ID |
+| `imageUrl` | `string` | Image URL sent in attachment |
+
+
+---
+
+
+### Get paginated image media for a channel
+
+```http
+GET /conversations/channels/{channelId}/media
+```
+
+Returns image attachments from channel messages. Media is sourced from Stream with cursor pagination.
+
+
+**Path parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `channelId` | `string` | Yes |  |
+
+**Query parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `limit` | `integer` | No |  |
+| `next` | `string` | No |  |
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `items` | `object[]` | Media items in the channel |
+| `next` | `string \| null` | Cursor for the next page, null when no more pages |
+
+
+---
+
+
+### Get conversation token for authenticated user
+
+```http
+POST /conversations/token
+```
+
+Returns JWT token for authenticating conversations (works for both chat and video)
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `token` | `string` | Conversation token for chat & video authentication |
+
+
+---
+
+
+### Archive a direct or group chat for current user
+
+```http
+POST /conversations/channels/archive
+```
+
+Archives channel for current user only. Used by frontend to move chat into Archived tab.
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `channelType` | `messaging \| team` | Yes |  |
+| `channelId` | `string` | Yes |  |
+| `clearHistory` | `boolean` | No |  |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `archived` | `boolean` | Archive status for current user |
+| `channelType` | `messaging \| team` | Stream channel type for archived or unarchived channel |
+| `channelId` | `string` | Stream channel ID |
+
+
+---
+
+
+### Unarchive a direct or group chat for current user
+
+```http
+POST /conversations/channels/unarchive
+```
+
+Unarchives channel for current user only. Used by frontend to move chat back to Active tab.
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `channelType` | `messaging \| team` | Yes |  |
+| `channelId` | `string` | Yes |  |
+| `clearHistory` | `boolean` | No |  |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `archived` | `boolean` | Archive status for current user |
+| `channelType` | `messaging \| team` | Stream channel type for archived or unarchived channel |
+| `channelId` | `string` | Stream channel ID |
+
+
+---
+
+## Conversations - Chat
+
+### Create or get direct message channel
+
+```http
+POST /conversations/chat/channels/direct
+```
+
+Creates 1-on-1 chat with another active user (blocked users are not allowed).
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `contactUserId` | `string` | Yes |  |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `channelId` | `string` | Channel ID (e.g., "user1-user2") |
+| `channelCid` | `string` | Full channel CID (e.g., "messaging:user1-user2") |
+
+
+---
+
+## Conversations - Groups
+
+### Create a new group conversation
+
+```http
+POST /conversations/groups
+```
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `name` | `string` | Yes |  |
+| `description` | `string` | No |  |
+| `imageUrl` | `string` | No |  |
+| `memberIds` | `string[]` | Yes |  |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `group` | `object` | Created group details |
+
+
+---
+
+
+### Get all groups for authenticated user
+
+```http
+GET /conversations/groups
+```
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `groups` | `object[]` | Groups for authenticated user |
+| `count` | `number` | Number of groups |
+
+
+---
+
+
+### Get group details by ID
+
+```http
+GET /conversations/groups/{groupId}
+```
+
+
+**Path parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `groupId` | `string` | Yes |  |
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `group` | `object` | Group details |
+
+
+---
+
+
+### Update group details (admin only)
+
+```http
+PUT /conversations/groups/{groupId}
+```
+
+
+**Path parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `groupId` | `string` | Yes |  |
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `name` | `string` | No |  |
+| `description` | `string` | No |  |
+| `imageUrl` | `string` | No |  |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `group` | `object` | Updated group details |
+
+
+---
+
+
+### Delete group conversation (admin only)
+
+```http
+DELETE /conversations/groups/{groupId}
+```
+
+
+**Path parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `groupId` | `string` | Yes |  |
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `deleted` | `boolean` | Whether the group was deleted |
+
+
+---
+
+
+### Add members to group (admin only)
+
+```http
+POST /conversations/groups/{groupId}/members
+```
+
+
+**Path parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `groupId` | `string` | Yes |  |
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `memberIds` | `string[]` | Yes |  |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `group` | `object` | Updated group with new members |
+
+
+---
+
+
+### Remove member from group (admin only)
+
+```http
+DELETE /conversations/groups/{groupId}/members/{userId}
+```
+
+
+**Path parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `groupId` | `string` | Yes |  |
+| `userId` | `string` | Yes |  |
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `group` | `object` | Updated group after member removal |
+
+
+---
+
+
+### Update group member role (admin only)
+
+```http
+PUT /conversations/groups/{groupId}/members/{userId}/role
+```
+
+
+**Path parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `groupId` | `string` | Yes |  |
+| `userId` | `string` | Yes |  |
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `role` | `ADMIN \| MEMBER` | Yes |  |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `group` | `object` | Updated group details |
+
+
+---
+
+
+### Leave group conversation
+
+```http
+POST /conversations/groups/{groupId}/leave
+```
+
+
+**Path parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `groupId` | `string` | Yes |  |
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `left` | `boolean` | Whether current user left the group |
+| `groupDeleted` | `boolean` | Whether the group was deleted because it became empty |
+
+
+---
+
+
+### Upload group image (admin only)
+
+```http
+POST /conversations/groups/{groupId}/image
+```
+
+
+**Path parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `groupId` | `string` | Yes |  |
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `group` | `object` | Updated group details |
+| `imageUrl` | `string` | Updated group image URL |
+
+
+---
+
+## Conversations - Video
+
+### Create or get a direct 1-on-1 call with a contact
+
+```http
+POST /conversations/video/calls/direct
+```
+
+Returns deterministic callId/callCid for Stream Video. Only works with mutual contacts.
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `contactUserId` | `string` | Yes |  |
+| `callType` | `default \| audio \| video` | No |  |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `callId` | `string` | Call ID (deterministic, Stream-safe) |
+| `callCid` | `string` | Full call CID (e.g., "default:callId") |
+
+
+---

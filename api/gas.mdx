@@ -1,0 +1,33 @@
+---
+title: Gas
+description: Gas fee estimates for on-chain operations.
+---
+
+<Warning>
+  The BKey API is in **active development**. Endpoints and schemas may change without notice.
+</Warning>
+
+
+### Get gas estimate for offramp
+
+```http
+GET /gas/estimate
+```
+
+Returns current Base network gas status and estimated cost for a typical cNGN offramp. Use before initiating offramp to warn users when fees are high.
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `status` | `normal \| elevated \| high \| critical` |  |
+| `maxFeePerGas` | `string` |  |
+| `maxFeePerGasGwei` | `string` |  |
+| `estimatedCostUsd` | `string` |  |
+| `thresholds` | `object` |  |
+| `recommendation` | `string` |  |
+| `timestamp` | `string` |  |
+
+
+---

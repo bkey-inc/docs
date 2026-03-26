@@ -1,0 +1,189 @@
+---
+title: PayTrie
+description: CAD on/offramp via PayTrie.
+---
+
+<Warning>
+  The BKey API is in **active development**. Endpoints and schemas may change without notice.
+</Warning>
+
+
+### PayTrieController_handleWebhook
+
+```http
+POST /paytrie/webhook
+```
+
+
+---
+
+
+### Update Canadian details for PayTrie onboarding
+
+```http
+PATCH /paytrie/canadian-details
+```
+
+Update Canadian contact details (email, phone, address) for users who want to onboard for CAD wallet via PayTrie.
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `canadianEmail` | `string` | Yes | Email address to use for PayTrie operations |
+| `canadianPhone` | `string` | Yes | Canadian phone number in E.164 format (e.g., +14161234567) |
+| `canadianAddress1` | `string` | Yes |  |
+| `canadianAddress2` | `string` | No |  |
+| `canadianCity` | `string` | Yes |  |
+| `canadianProvince` | `ab \| bc \| mb \| nb \| nl \| ns \| nt \| nu \| on \| pe \| qc \| sk \| yt` | Yes | Canadian province code (e.g., "on" for Ontario) |
+| `canadianPostalCode` | `string` | Yes |  |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `success` | `boolean` |  |
+| `message` | `string` |  |
+
+
+---
+
+
+### Send transaction OTP
+
+```http
+POST /paytrie/transaction/otp
+```
+
+Sends an OTP to the user email for transaction authentication. Must be called before onramp or offramp.
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `success` | `boolean` | Whether the OTP was sent successfully |
+
+
+---
+
+
+### Get CAD to CADC price quote
+
+```http
+GET /paytrie/quote
+```
+
+Returns a price quote for converting CAD to CADC on Base
+
+
+**Query parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `amount` | `string` | Yes | Amount in CAD |
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `quoteId` | `number` | Quote ID to use when creating transaction |
+| `cadAmount` | `string` | CAD amount |
+| `cadcAmount` | `string` | CADC amount to receive |
+| `exchangeRate` | `number` | CAD/USD exchange rate |
+| `fee` | `number` | Fee amount if applicable |
+
+
+---
+
+
+### Create CAD to CADC onramp transaction
+
+```http
+POST /paytrie/onramp
+```
+
+Creates a transaction to convert CAD to CADC via Interac e-Transfer
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `walletId` | `string` | Yes | The CADC wallet ID to receive funds |
+| `cadAmount` | `number` | Yes | Amount in CAD to convert |
+| `code` | `string` | Yes | OTP code received via email |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `transactionId` | `string` | Internal transaction ID |
+| `paytrieTransactionId` | `string` | PayTrie transaction ID |
+| `status` | `string` | Transaction status |
+| `cadAmount` | `string` | CAD amount sent |
+| `cadcAmount` | `string` | CADC amount to receive |
+
+
+---
+
+
+### Get CADC to CAD price quote
+
+```http
+GET /paytrie/offramp/quote
+```
+
+Returns a price quote for converting CADC to CAD
+
+
+**Query parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `amount` | `string` | Yes | Amount in CADC |
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `quoteId` | `number` | Quote ID to use when creating transaction |
+| `cadcAmount` | `string` | CADC amount to send |
+| `cadAmount` | `string` | CAD amount to receive |
+| `exchangeRate` | `number` | CAD/USD exchange rate |
+| `fee` | `number` | Fee amount if applicable |
+
+
+---
+
+
+### Create CADC to CAD offramp transaction
+
+```http
+POST /paytrie/offramp
+```
+
+Creates a transaction to convert CADC to CAD with bank deposit
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `walletId` | `string` | Yes | The CADC wallet ID to send from |
+| `cadcAmount` | `number` | Yes | Amount in CADC to convert |
+| `code` | `string` | Yes | OTP code received via email |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `signatureRequest` | `object` | Signature request details |
+| `quote` | `object` | Quote details |
+
+
+---

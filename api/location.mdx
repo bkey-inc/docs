@@ -1,0 +1,56 @@
+---
+title: Location
+description: Countries, subdivisions, and supported regions.
+---
+
+<Warning>
+  The BKey API is in **active development**. Endpoints and schemas may change without notice.
+</Warning>
+
+
+### Get all countries
+
+```http
+GET /location/countries
+```
+
+Returns a list of all supported countries for KYC validation
+
+
+---
+
+
+### Get country with subdivisions
+
+```http
+GET /location/countries/{countryCode}
+```
+
+Returns a single country with all its subdivisions. Accepts both alpha2 (NG, US, GB) and alpha3 (NGA, USA, GBR) country codes.
+
+
+**Path parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `countryCode` | `USA \| NGA \| GHA \| GBR \| IND \| ZAF \| CAN \| CHN` | Yes | Country code (alpha2 or alpha3 format) |
+
+---
+
+
+### Get subdivisions for a country
+
+```http
+GET /location/countries/{countryCode}/subdivisions
+```
+
+Returns all subdivisions (states/provinces) for a specific country. Accepts both alpha2 (NG, US, GB) and alpha3 (NGA, USA, GBR) country codes.
+
+
+**Path parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `countryCode` | `USA \| NGA \| GHA \| GBR \| IND \| ZAF \| CAN \| CHN` | Yes | Country code (alpha2 or alpha3 format) |
+
+---

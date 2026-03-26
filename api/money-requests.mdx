@@ -1,0 +1,364 @@
+---
+title: Money Requests
+description: Request, approve, reject, and cancel money requests between users.
+---
+
+<Warning>
+  The BKey API is in **active development**. Endpoints and schemas may change without notice.
+</Warning>
+
+
+## Money Requests
+
+### Create a new money request
+
+```http
+POST /user/money-requests
+```
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `toWalletId` | `string` | Yes | The wallet ID to request money to |
+| `requesteeId` | `string` | Yes | The user ID to request money from |
+| `amount` | `number` | Yes | The amount to request |
+| `note` | `string` | No | Optional note for the money request |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `success` | `boolean` | Operation success status |
+| `moneyRequest` | `object` | Created money request details |
+
+
+---
+
+
+### Get money requests for the authenticated user
+
+```http
+GET /user/money-requests
+```
+
+
+**Query parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `status` | `PENDING \| APPROVED \| REJECTED \| CANCELLED \| PARTIALLY_FULFILLED` | No | Filter money requests by status |
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `moneyRequests` | `object[]` | List of money requests |
+
+
+---
+
+
+### Get a money request by ID
+
+```http
+GET /user/money-requests/{requestId}
+```
+
+
+**Path parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `requestId` | `string` | Yes | Money request ID to fetch |
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `moneyRequest` | `object` | Money request details |
+
+
+---
+
+
+### Get money requests for a specific wallet
+
+```http
+GET /user/money-requests/{walletId}/requests
+```
+
+
+**Path parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `walletId` | `string` | Yes | Wallet ID to fetch money requests for |
+
+---
+
+
+### Reject a money request
+
+```http
+PUT /user/money-requests/{requestId}/reject
+```
+
+
+**Path parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `requestId` | `string` | Yes | Money request ID to reject |
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `success` | `boolean` | Operation success status |
+| `moneyRequest` | `object` | Updated money request details |
+
+
+---
+
+
+### Cancel a money request
+
+```http
+PUT /user/money-requests/{requestId}/cancel
+```
+
+
+**Path parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `requestId` | `string` | Yes | Money request ID to cancel |
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `success` | `boolean` | Operation success status |
+| `moneyRequest` | `object` | Updated money request details |
+
+
+---
+
+
+### Approve a money request
+
+```http
+POST /user/money-requests/approve
+```
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `requestId` | `string` | Yes | The money request ID to approve |
+| `fromWalletId` | `string` | Yes | The wallet to get the funds from |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `method` | `evm \| solana` |  |
+| `walletIndex` | `number` |  |
+| `workflowId` | `string` |  |
+| `hashToSign` | `string` |  |
+| `payload` | `string` |  |
+| `deadline` | `string` |  |
+
+
+---
+
+## Money Requests V2
+
+### Create a money request
+
+```http
+POST /v2/money-requests
+```
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `requesteeId` | `string` | Yes | The user ID to request money from |
+| `amount` | `string` | Yes | The amount to request as a decimal string |
+| `currency` | `USD \| NGN \| CAD \| EUR \| GBP \| MXN` | Yes | The currency for the money request |
+| `note` | `string` | No | Optional note for the money request |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | `string` | Money request unique ID |
+| `amount` | `string` | Requested amount as decimal string |
+| `currency` | `USD \| NGN \| CAD \| EUR \| GBP \| MXN` | Currency |
+| `direction` | `sent \| received` | Direction from user perspective: sent or received |
+| `status` | `PENDING \| APPROVED \| REJECTED \| CANCELLED \| PARTIALLY_FULFILLED` | Request status |
+| `note` | `string \| null` | Optional note |
+| `otherUser` | `object` | The other person in this request |
+| `createdAt` | `string` | Creation date |
+| `expiresAt` | `string \| null` | Expiration date |
+
+
+---
+
+
+### Get money requests for the authenticated user
+
+```http
+GET /v2/money-requests
+```
+
+
+**Query parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `status` | `PENDING \| APPROVED \| REJECTED \| CANCELLED` | No | Filter by money request status |
+| `direction` | `sent \| received` | No | Filter by direction: sent or received |
+| `currency` | `USD \| NGN \| CAD \| EUR \| GBP \| MXN` | No | Filter by currency |
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `data` | `object[]` | List of money requests |
+
+
+---
+
+
+### Get a money request by ID
+
+```http
+GET /v2/money-requests/{requestId}
+```
+
+
+**Path parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `requestId` | `string` | Yes |  |
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | `string` | Money request unique ID |
+| `amount` | `string` | Requested amount as decimal string |
+| `currency` | `USD \| NGN \| CAD \| EUR \| GBP \| MXN` | Currency |
+| `direction` | `sent \| received` | Direction from user perspective: sent or received |
+| `status` | `PENDING \| APPROVED \| REJECTED \| CANCELLED \| PARTIALLY_FULFILLED` | Request status |
+| `note` | `string \| null` | Optional note |
+| `otherUser` | `object` | The other person in this request |
+| `createdAt` | `string` | Creation date |
+| `expiresAt` | `string \| null` | Expiration date |
+
+
+---
+
+
+### Reject a money request
+
+```http
+POST /v2/money-requests/{requestId}/reject
+```
+
+
+**Path parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `requestId` | `string` | Yes |  |
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | `string` | Money request unique ID |
+| `amount` | `string` | Requested amount as decimal string |
+| `currency` | `USD \| NGN \| CAD \| EUR \| GBP \| MXN` | Currency |
+| `direction` | `sent \| received` | Direction from user perspective: sent or received |
+| `status` | `PENDING \| APPROVED \| REJECTED \| CANCELLED \| PARTIALLY_FULFILLED` | Request status |
+| `note` | `string \| null` | Optional note |
+| `otherUser` | `object` | The other person in this request |
+| `createdAt` | `string` | Creation date |
+| `expiresAt` | `string \| null` | Expiration date |
+
+
+---
+
+
+### Cancel a money request
+
+```http
+POST /v2/money-requests/{requestId}/cancel
+```
+
+
+**Path parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `requestId` | `string` | Yes |  |
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | `string` | Money request unique ID |
+| `amount` | `string` | Requested amount as decimal string |
+| `currency` | `USD \| NGN \| CAD \| EUR \| GBP \| MXN` | Currency |
+| `direction` | `sent \| received` | Direction from user perspective: sent or received |
+| `status` | `PENDING \| APPROVED \| REJECTED \| CANCELLED \| PARTIALLY_FULFILLED` | Request status |
+| `note` | `string \| null` | Optional note |
+| `otherUser` | `object` | The other person in this request |
+| `createdAt` | `string` | Creation date |
+| `expiresAt` | `string \| null` | Expiration date |
+
+
+---
+
+
+### Approve a money request
+
+```http
+POST /v2/money-requests/{requestId}/approve
+```
+
+
+**Path parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `requestId` | `string` | Yes |  |
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `fromWalletId` | `string` | Yes | Wallet ID to pay from (required) |
+| `amount` | `string` | No | Optional amount to pay (for partial fulfillment). If not provided, the full requested amount will be paid. |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `signatureRequest` | `object` | Signature request details |
+| `quote` | `object` | Exchange rate quote (always present) |
+
+
+---

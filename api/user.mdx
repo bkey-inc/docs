@@ -1,0 +1,341 @@
+---
+title: User
+description: Create and manage user accounts, profiles, and preferences.
+---
+
+<Warning>
+  The BKey API is in **active development**. Endpoints and schemas may change without notice.
+</Warning>
+
+
+## User
+
+### Create a new user
+
+```http
+POST /user
+```
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `firstName` | `string` | Yes | User's first name |
+| `publicKey` | `string` | Yes | User Public Key |
+| `identityId` | `string` | Yes | Identity identifier |
+| `phoneNumber` | `string` | Yes |  |
+| `email` | `string` | Yes | Valid email address |
+| `locale` | `en \| es \| fr \| pt \| zh \| ar \| de` | No | User preferred language (ISO 639-1 code) |
+| `defaultCountryCode` | `USA \| NGA \| GHA \| GBR \| IND \| ZAF \| CAN \| CHN \| EUR \| MEX` | No |  |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `success` | `boolean` | Authentication success status |
+| `message` | `string` | Success message |
+| `token` | `string` | JWT session token |
+| `recoveryToken` | `string` | Recovery JWT token |
+| `expiresIn` | `number` | Session token expiration time in seconds |
+| `user` | `object` | Minimal user details |
+
+
+---
+
+
+### Delete current user account
+
+```http
+DELETE /user
+```
+
+Deactivates the user account by setting the active flag to false. User must have empty wallets before deletion can proceed.
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `success` | `boolean` | Indicates if the user was successfully deactivated |
+| `message` | `string` | Response message |
+
+
+---
+
+
+### Find user by phone number
+
+```http
+GET /user/lookup/{phoneNumber}
+```
+
+Looks up a user by their E.164 phone number. The phone number must be valid and properly formatted. Returns 404 if no user found, or 200 with user details if found.
+
+
+**Path parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `phoneNumber` | `string` | Yes | Valid E.164 formatted phone number. Must be a real, valid phone number that starts with + followed by country code and number. No spaces, dashes, or other characters allowed. |
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `success` | `boolean` | Operation success status |
+| `user` | `object` | User details found by phone number |
+
+
+---
+
+
+### Check if user exists by phone number
+
+```http
+POST /user/exists
+```
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `phoneNumber` | `string` | Yes |  |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `exists` | `boolean` | Indicates whether a user exists with the given phone number |
+
+
+---
+
+
+### Get current user profile
+
+```http
+GET /user/profile
+```
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `displayImage` | `string \| null` | User display image URL |
+| `firstName` | `string` |  |
+| `lastName` | `string \| null` |  |
+| `middleName` | `string \| null` |  |
+| `id` | `string` | User ID |
+| `phoneNumber` | `object` |  |
+| `email` | `string \| null` |  |
+| `referralCode` | `string \| null` | User referral code |
+| `canEditDisplayName` | `boolean` | Whether this user can edit their display name |
+| `defaultCountryCode` | `USA \| NGA \| GHA \| GBR \| IND \| ZAF \| CAN \| CHN \| EUR \| MEX \| null` | User default country code |
+
+
+---
+
+
+### Update display name (backdoor users only)
+
+```http
+PATCH /user/display-name
+```
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `displayName` | `string` | Yes | New display name for the user |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `success` | `boolean` |  |
+| `displayName` | `string` | Updated display name |
+
+
+---
+
+
+### Upload or update profile image
+
+```http
+POST /user/update-profile-image
+```
+
+
+---
+
+
+### Apply a referral code to current user
+
+```http
+POST /user/apply-referral
+```
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `referralCode` | `string` | Yes | Referral code to apply |
+
+
+---
+
+
+### Get users referred by the current user
+
+```http
+GET /user/referrals
+```
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `users` | `object[]` |  |
+
+
+---
+
+
+### Update user preferred language
+
+```http
+POST /user/locale
+```
+
+Updates the user preferred language/locale for notifications and messages. Supported values: en, es, fr, pt, zh
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `locale` | `en \| es \| fr \| pt \| zh \| ar \| de` | Yes | User preferred language (ISO 639-1 code: en, es, fr, pt, zh) |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `success` | `boolean` |  |
+| `locale` | `en \| es \| fr \| pt \| zh \| ar \| de` | Updated locale |
+
+
+---
+
+
+### Get user preferred language
+
+```http
+GET /user/locale
+```
+
+Gets the user preferred language/locale setting
+
+
+---
+
+## User v2
+
+### Create a new user (v2)
+
+```http
+POST /v2/user
+```
+
+Creates a user with only firstName, phoneNumber, and email. Public key and identity ID can be added later via the update identity endpoint.
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `firstName` | `string` | Yes | User's first name |
+| `phoneNumber` | `string` | Yes |  |
+| `email` | `string` | Yes | Valid email address |
+| `locale` | `en \| es \| fr \| pt \| zh \| ar \| de` | No | User preferred language (ISO 639-1 code) |
+| `defaultCountryCode` | `USA \| NGA \| GHA \| GBR \| IND \| ZAF \| CAN \| CHN \| EUR \| MEX` | No |  |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `success` | `boolean` | User creation success status |
+| `message` | `string` | Success message |
+| `token` | `string` | JWT session token |
+| `recoveryToken` | `string` | Recovery JWT token |
+| `expiresIn` | `number` | Session token expiration time in seconds |
+| `user` | `object` | User details |
+
+
+---
+
+
+### Update user identity
+
+```http
+POST /v2/user/identity
+```
+
+Updates the authenticated user with publicKey and identityId. Can only be called once - identity cannot be changed after being set.
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `publicKey` | `string` | Yes | User Public Key |
+| `identityId` | `string` | Yes | Identity identifier |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `success` | `boolean` | Update success status |
+| `message` | `string` | Success message |
+| `user` | `object` |  |
+
+
+---
+
+
+### Lookup users by hashed phone numbers (v2)
+
+```http
+POST /v2/user/lookup
+```
+
+Checks which submitted phone hashes exist in the backend for the provided hash scheme and returns hash-to-user matches.
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `phoneHashes` | `string[]` | Yes | List of phone hashes to look up |
+| `hashScheme` | `HMAC-SHA256:E164:v1` | Yes | Hash algorithm/scheme used to produce phoneHashes |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `matches` | `object[]` | Hash to user mappings found in BMoni database |
+
+
+---

@@ -51,8 +51,32 @@
       {
         "group": "API Reference",
         "pages": [
+          "api/overview",
+          "api/authentication",
+          "api/user",
           "api/wallets",
-          "api/cards"
+          "api/cards",
+          "api/transactions",
+          "api/contacts",
+          "api/conversations",
+          "api/kyc",
+          "api/onboarding",
+          "api/banking",
+          "api/offramp",
+          "api/onramp",
+          "api/exchange",
+          "api/money-requests",
+          "api/notifications",
+          "api/payment",
+          "api/affiliate",
+          "api/location",
+          "api/paytrie",
+          "api/monerium",
+          "api/recovery",
+          "api/webhooks",
+          "api/conduit",
+          "api/gas",
+          "api/admin"
         ]
       }
     ]

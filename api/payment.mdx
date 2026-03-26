@@ -1,0 +1,36 @@
+---
+title: Payment
+description: Merchant payment utilities.
+---
+
+<Warning>
+  The BKey API is in **active development**. Endpoints and schemas may change without notice.
+</Warning>
+
+
+### Select wallet for payment
+
+```http
+POST /payment/select-wallet
+```
+
+Select which wallet to use for payment. Can be called multiple times before signature submission.
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `workflowId` | `string` | Yes |  |
+| `walletId` | `string` | Yes |  |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `signatureRequest` | `object` | Signature request details |
+| `quote` | `object` | Exchange rate quote for the payment transaction |
+
+
+---

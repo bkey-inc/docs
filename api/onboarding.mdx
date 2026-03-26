@@ -1,0 +1,222 @@
+---
+title: Onboarding
+description: Country-specific onboarding flows and status checks.
+---
+
+<Warning>
+  The BKey API is in **active development**. Endpoints and schemas may change without notice.
+</Warning>
+
+
+## Onboard
+
+### Start Nigeria onboarding flow
+
+```http
+POST /onboarding/start-nigeria
+```
+
+Starts the Nigeria-specific onboarding workflow with BVN verification, NGN wallet, and Anchor + Bridge integration.
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `bvn` | `string` | Yes |  |
+| `usdWalletAddress` | `string` | Yes |  |
+| `usdWalletIndex` | `number` | Yes | USD wallet index |
+| `ngnWalletAddress` | `string` | Yes |  |
+| `ngnWalletIndex` | `number` | Yes | NGN wallet index |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `workflowId` | `string` | Workflow ID for the onboarding process |
+| `isNigeria` | `boolean` | Indicates this is Nigeria onboarding |
+| `status` | `object` | Onboarding status indicators |
+
+
+---
+
+
+### Start international onboarding flow
+
+```http
+POST /onboarding/start
+```
+
+Starts the international onboarding workflow for rest of world users with Bridge integration.
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `usdWalletAddress` | `string` | Yes |  |
+| `usdWalletIndex` | `number` | Yes | USD wallet index |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `workflowId` | `string` | Workflow ID for the onboarding process |
+| `isNigeria` | `boolean` | Indicates this is international onboarding |
+| `status` | `object` | Onboarding status indicators |
+
+
+---
+
+
+### Start Canada onboarding flow
+
+```http
+POST /onboarding/start-canada
+```
+
+Starts the Canada-specific onboarding workflow with PayTrie KYC integration.
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `cadWalletAddress` | `string` | Yes |  |
+| `cadWalletIndex` | `number` | Yes | CAD wallet index |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `workflowId` | `string` | Workflow ID for the onboarding process |
+| `idenfyUrl` | `string` | iDenfy verification URL for PayTrie KYC |
+| `status` | `object` | Onboarding status indicators |
+
+
+---
+
+
+### Start Monerium onboarding flow
+
+```http
+POST /onboarding/start-monerium
+```
+
+Starts the Monerium-specific onboarding workflow for EU users with EUR wallet integration. If signatureRequest is returned, submit it via wallet signature endpoint to complete Base account creation.
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `eurWalletAddress` | `string` | Yes |  |
+| `eurWalletIndex` | `number` | Yes | EUR wallet index |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `signatureRequest` | `object` |  |
+| `onboardingUrl` | `string` | Onboarding URL for the onboarding process |
+| `messageToSign` | `string` | Message to sign for the onboarding process |
+
+
+---
+
+
+### Get onboarding status
+
+```http
+GET /onboarding/status
+```
+
+Get the status of the onboarding process
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `anchorStatus` | `not_started \| pending \| active \| resubmission_required \| rejected` | Anchor onboarding status |
+| `bridgeStatus` | `not_started \| pending \| active \| resubmission_required \| rejected` | Bridge onboarding status |
+| `moneriumStatus` | `not_started \| pending \| active \| resubmission_required \| rejected` | Monerium onboarding status |
+| `bridgeRetryAllowed` | `boolean` | Whether the user can retry Bridge KYC (only present if rejected) |
+| `bridgeRejectionReasons` | `string[]` | Bridge rejection reasons if status is resubmission_required |
+| `bridgeRejectionCues` | `string[]` | User-facing guidance cues for Bridge KYC rejection |
+| `paytrieStatus` | `not_started \| pending \| active \| resubmission_required \| rejected` | PayTrie onboarding status (Canada) |
+| `paytrieRejectionReason` | `string` | PayTrie rejection reason if status is resubmission_required |
+
+
+---
+
+## Tier
+
+### Get all available tiers
+
+```http
+GET /tier
+```
+
+Returns all available tier levels (Bronze, Silver, Gold, Platinum) with their configurations and pricing. Requires authentication.
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `tiers` | `object[]` |  |
+
+
+---
+
+
+### Get current user tier
+
+```http
+GET /tier/current
+```
+
+Returns the tier for the authenticated user. Currently hardcoded to BRONZE tier.
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `name` | `BRONZE \| SILVER \| GOLD \| PLATINUM` |  |
+| `acquisition` | `object` | How to obtain this tier |
+| `fees` | `object` | Base fees for bank and crypto operations |
+| `features` | `object` | Virtual Bank Account features and their costs |
+
+
+---
+
+## Capabilities
+
+### Get capabilities
+
+```http
+GET /capabilities/v1
+```
+
+Get the capabilities of the system including fiat rail status per wallet
+
+
+---
+
+
+### Get application config
+
+```http
+GET /capabilities/v1/config
+```
+
+Get the application config
+
+
+---

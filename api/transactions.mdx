@@ -1,0 +1,172 @@
+---
+title: Transactions
+description: Retrieve transaction history, fees, and generate receipts.
+---
+
+<Warning>
+  The BKey API is in **active development**. Endpoints and schemas may change without notice.
+</Warning>
+
+
+## Transaction
+
+### Generate transaction receipt PDF
+
+```http
+POST /transaction/v1/receipt/pdf
+```
+
+Generate a PDF receipt for a specific transaction with timezone support
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `walletId` | `string` | Yes | Wallet ID |
+| `transactionId` | `string` | Yes | Transaction ID |
+| `timezone` | `string` | No | IANA timezone identifier |
+
+
+---
+
+
+### Get fees for a transaction
+
+```http
+GET /transaction/v1/wallet/{walletId}/{transactionId}/fees
+```
+
+Returns all visible fees for a transaction. Swap premium (exchange) fees are excluded.
+
+
+**Path parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `walletId` | `string` | Yes |  |
+| `transactionId` | `string` | Yes |  |
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `fees` | `object[]` | List of fees for the transaction |
+| `totalFees` | `object` | Total fee amount grouped by currency |
+
+
+---
+
+
+### Get wallet transactions
+
+```http
+GET /transaction/v1/wallet/{walletId}
+```
+
+Get all transactions for a specific wallet
+
+
+**Path parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `walletId` | `string` | Yes |  |
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `transactions` | `object[]` | List of transactions |
+| `count` | `number` | Total number of transactions |
+
+
+---
+
+
+### Get transactions with another user
+
+```http
+GET /transaction/v1/user/{otherUserId}
+```
+
+Get all transactions between the current user and another user
+
+
+**Path parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `otherUserId` | `string` | Yes |  |
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `transactions` | `object[]` | List of transactions between users |
+| `count` | `number` | Total number of transactions |
+| `otherUser` | `object` | Other user details |
+
+
+---
+
+## Claimable Transfer
+
+### Create a new claimable transfer
+
+```http
+POST /claimable-transfer/create
+```
+
+Starts a workflow and returns signature request
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `recipientPhoneE164` | `string` | Yes |  |
+| `walletId` | `string` | Yes |  |
+| `amount` | `string` | Yes |  |
+| `message` | `string` | No |  |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `success` | `boolean` |  |
+| `workflowId` | `string` |  |
+| `hashToSign` | `string` |  |
+
+
+---
+
+
+### Submit signature for claimable transfer
+
+```http
+POST /claimable-transfer/submit-signature
+```
+
+Submits signature and executes transfer to escrow
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `workflowId` | `string` | Yes |  |
+| `signature` | `string` | Yes |  |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `success` | `boolean` |  |
+| `escrowTxHash` | `string` |  |
+| `message` | `string` |  |
+
+
+---

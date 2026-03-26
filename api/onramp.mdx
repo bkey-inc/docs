@@ -1,0 +1,237 @@
+---
+title: Onramp
+description: Top up wallets from crypto sources.
+---
+
+<Warning>
+  The BKey API is in **active development**. Endpoints and schemas may change without notice.
+</Warning>
+
+
+### Get supported crypto sources for top-up
+
+```http
+GET /onramp/crypto/supported/USD
+```
+
+Returns supported currencies grouped by chain for crypto top-up
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `items` | `object[]` | Supported currencies grouped by chain |
+
+
+---
+
+
+### Create a crypto top-up
+
+```http
+POST /onramp/crypto
+```
+
+Creates a deposit address for sending crypto that will be converted to the wallet currency
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `walletId` | `string` | Yes | The wallet ID to deposit to |
+| `chain` | `Arbitrum \| Avalanche \| Base \| Ethereum \| Optimism \| Polygon \| Solana \| Stellar \| Tron` | Yes | Blockchain network |
+| `currency` | `DAI \| EURC \| PYUSD \| USDB \| USDC \| USDP \| USDT` | Yes | Currency to deposit |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `address` | `string` | The deposit address |
+| `chain` | `Arbitrum \| Avalanche \| Base \| Ethereum \| Optimism \| Polygon \| Solana \| Stellar \| Tron` | Blockchain network |
+| `currency` | `DAI \| EURC \| PYUSD \| USDB \| USDC \| USDP \| USDT` | Currency to deposit |
+
+
+---
+
+
+### Check if a failed transaction can be resumed
+
+```http
+GET /onramp/admin/transactions/{transactionId}/can-resume
+```
+
+Returns whether the transaction can be resumed and which step failed
+
+
+**Path parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `transactionId` | `string` | Yes | The transaction ID to check |
+
+---
+
+
+### Resume a failed onramp transaction
+
+```http
+POST /onramp/admin/transactions/{transactionId}/resume
+```
+
+Starts a Temporal workflow to resume the transaction from where it failed
+
+
+**Path parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `transactionId` | `string` | Yes | The transaction ID to resume |
+
+---
+
+
+### Resume multiple failed onramp transactions
+
+```http
+POST /onramp/admin/transactions/bulk-resume
+```
+
+Starts Temporal workflows to resume multiple transactions from where they failed
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `transactionIds` | `string[]` | Yes | Array of transaction IDs to resume |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `total` | `number` | Total number of transactions processed |
+| `successful` | `number` | Number of successfully started resume workflows |
+| `failed` | `number` | Number of failed resume attempts |
+| `items` | `object[]` | Detailed results for each transaction |
+
+
+---
+
+
+### Resume all failed onramp transactions within a date range
+
+```http
+POST /onramp/admin/transactions/bulk-resume-by-date
+```
+
+Finds all failed bank onramp transactions within the specified date range and starts resume workflows for each
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `startDate` | `string` | Yes | Start date for the date range (ISO 8601 format) |
+| `endDate` | `string` | Yes | End date for the date range (ISO 8601 format) |
+| `onrampType` | `usdb \| cngn` | No | Filter by onramp type. If not specified, resumes both USDB and CNGN onramps. |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `total` | `number` | Total number of transactions processed |
+| `successful` | `number` | Number of successfully started resume workflows |
+| `failed` | `number` | Number of failed resume attempts |
+| `items` | `object[]` | Detailed results for each transaction |
+
+
+---
+
+
+### Preview settlement candidates
+
+```http
+GET /onramp/admin/settlement/preview
+```
+
+Returns failed cNGN onramp transactions that have blockchain tx hashes and could be settled
+
+
+**Query parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `startDate` | `string` | Yes | Start date for the settlement range (YYYY-MM-DD format) |
+| `endDate` | `string` | Yes | End date for the settlement range (YYYY-MM-DD format) |
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `totalCandidates` | `number` |  |
+| `candidates` | `object[]` |  |
+
+
+---
+
+
+### Trigger settlement workflow
+
+```http
+POST /onramp/admin/settlement/trigger
+```
+
+Starts a Temporal workflow to sync ERC20 transfers and settle failed cNGN onramps
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `startDate` | `string` | Yes | Start date for the settlement range (YYYY-MM-DD format) |
+| `endDate` | `string` | Yes | End date for the settlement range (YYYY-MM-DD format) |
+| `skipNotifications` | `boolean` | No | If true, skip sending notifications to users |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `workflowId` | `string` |  |
+| `message` | `string` |  |
+
+
+---
+
+
+### Trigger ERC20 transfers sync workflow
+
+```http
+POST /onramp/admin/erc20-transfers/sync
+```
+
+Starts a Temporal workflow to fetch ERC20 transfer events from the blockchain and store them in the database
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `startBlock` | `string` | No | Starting block number. If not provided, continues from the last synced block. |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `workflowId` | `string` |  |
+| `message` | `string` |  |
+| `startBlock` | `string` |  |
+
+
+---

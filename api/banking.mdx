@@ -1,0 +1,224 @@
+---
+title: Banking & Virtual Accounts
+description: Deposit accounts, withdrawal accounts, Nigerian bank lookup, and account verification.
+---
+
+<Warning>
+  The BKey API is in **active development**. Endpoints and schemas may change without notice.
+</Warning>
+
+
+### Get deposit bank accounts
+
+```http
+GET /vba/v1/deposit-accounts
+```
+
+Retrieve all active deposit bank accounts for the authenticated user, including auto-sweep configuration
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `nigerianAccounts` | `object[]` | Nigerian deposit accounts |
+| `activationAccounts` | `object[]` | Static activation accounts backed by Anchor pooled VBAs |
+| `europeanAccounts` | `object[]` | European deposit accounts |
+| `usaAccounts` | `object[]` | USA deposit accounts |
+
+
+---
+
+
+### create deposit bank account
+
+```http
+POST /vba/v1/deposit-accounts
+```
+
+Create a new deposit bank account for the authenticated user (USA or EUR)
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `region` | `USA \| EUR` | Yes | Region for the deposit account (USA or EUR) |
+| `walletId` | `string` | Yes | ID of the wallet to sweep deposits to |
+| `ownershipModel` | `dedicated \| shared` | No | Ownership model for the account: "dedicated" for VBA (unique account per user), "shared" for shared account with reference |
+
+
+---
+
+
+### Create Blockradar NGN deposit account
+
+```http
+POST /vba/v1/deposit-accounts/blockradar
+```
+
+Create a new Blockradar virtual bank account for NGN deposits. The account is linked to the specified wallet and can receive NGN bank transfers that are automatically converted to cNGN.
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `walletId` | `string` | Yes |  |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | `string` |  |
+| `accountName` | `string` |  |
+| `accountNumber` | `string` |  |
+| `bankName` | `string` |  |
+| `bankCode` | `string` |  |
+| `currency` | `string` |  |
+| `provider` | `string` |  |
+
+
+---
+
+
+### Get withdrawal bank accounts
+
+```http
+GET /vba/v1/withdrawal-accounts
+```
+
+Retrieve all active withdrawal bank accounts for the authenticated user
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `nigerianAccounts` | `object[]` | Nigerian withdrawal accounts |
+| `europeanAccounts` | `object[]` | European withdrawal accounts |
+| `usaAccounts` | `object[]` | USA withdrawal accounts |
+
+
+---
+
+
+### Get or create Nigerian withdrawal account
+
+```http
+POST /vba/v1/withdrawal-accounts/nigeria
+```
+
+Get existing or create a new Nigerian bank account for offramp withdrawals. If an account with the same account number already exists, it will be returned instead of creating a new one.
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `accountNumber` | `string` | Yes | 10-digit Nigerian bank account number |
+| `bankCode` | `string` | Yes | Nigerian bank code (e.g., 058 for GTBank) |
+| `bankName` | `string` | Yes | Name of the Nigerian bank |
+| `accountHolderName` | `string` | Yes | Name of the account holder |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | `string` | Unique identifier for the account |
+| `accountName` | `string` | Account name |
+| `bankName` | `string` | Bank name |
+| `currency` | `USD \| EUR \| NGN \| CNY \| CAD \| GBP \| MXN` | Currency |
+| `depositMessage` | `string` | Deposit message for shared accounts |
+| `accountNumber` | `string` | Account number |
+| `bankCode` | `string` | Bank code |
+
+
+---
+
+
+### Get list of Nigerian banks
+
+```http
+GET /vba/v1/nigerian-banks
+```
+
+Retrieve the list of supported Nigerian banks for account creation
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `banks` | `object[]` |  |
+
+
+---
+
+
+### Verify Nigerian bank account and fetch account name
+
+```http
+POST /vba/v1/verify-nigerian-account
+```
+
+Verify that a Nigerian bank account exists and fetch the account holder's name
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `bankCode` | `string` | Yes | Nigerian bank code (e.g., 058 for GTBank) |
+| `accountNumber` | `string` | Yes | 10-digit Nigerian bank account number |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `accountNumber` | `string` | The verified account number |
+| `accountName` | `string` | The account holder's name |
+| `bankName` | `string` | The name of the bank |
+| `bankCode` | `string` | The bank code |
+
+
+---
+
+
+### Deactivate a deposit account
+
+```http
+PUT /vba/v1/deposit-accounts/{accountId}/deactivate
+```
+
+Deactivate a Bridge virtual bank account (US/EU). The account will be deactivated in Bridge and marked as inactive in the database.
+
+
+**Path parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `accountId` | `string` | Yes |  |
+
+---
+
+
+### Deactivate a Nigerian withdrawal account
+
+```http
+PUT /vba/v1/withdrawal-accounts/nigeria/{accountId}/deactivate
+```
+
+Deactivate a Nigerian withdrawal bank account. The account will be marked as inactive in the database.
+
+
+**Path parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `accountId` | `string` | Yes |  |
+
+---

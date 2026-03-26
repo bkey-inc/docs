@@ -1,0 +1,258 @@
+---
+title: Offramp
+description: Cash out wallet balances to bank accounts, crypto, and regional rails.
+---
+
+<Warning>
+  The BKey API is in **active development**. Endpoints and schemas may change without notice.
+</Warning>
+
+
+## Offramp
+
+### Create offramp to Nigerian bank account (deprecated)
+
+```http
+POST /offramp/nigeria
+```
+
+Creates an offramp transaction to a Nigerian bank account. DEPRECATED: Use POST /v2/offramp/nigeria instead for quote information.
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `sourceWalletId` | `string` | Yes | Source wallet ID to offramp from |
+| `bankAccountId` | `string` | Yes | Bank account ID to receive funds |
+| `fromAmount` | `string` | Yes | Amount of USDB to offramp |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `method` | `evm \| solana` |  |
+| `walletIndex` | `number` |  |
+| `workflowId` | `string` |  |
+| `hashToSign` | `string` |  |
+| `payload` | `string` |  |
+| `deadline` | `string` |  |
+
+
+---
+
+
+### Create offramp to US bank account
+
+```http
+POST /offramp/us-bank-account
+```
+
+Creates an ACH offramp transaction to a US bank account
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `walletId` | `string` | Yes | Source wallet ID |
+| `amount` | `string` | Yes | Amount to offramp in USD |
+| `recipientBankDetails` | `object` | Yes | Recipient bank account details |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `signatureRequest` | `object` | Signature request details |
+| `quote` | `object` | Quote details |
+
+
+---
+
+
+### Get supported crypto destinations for offramp
+
+```http
+GET /offramp/crypto/supported/USD
+```
+
+Returns supported currencies grouped by chain for crypto offramp
+
+
+---
+
+
+### Create offramp to crypto
+
+```http
+POST /offramp/crypto
+```
+
+Creates an offramp transaction to crypto
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `sourceWalletId` | `string` | Yes | Source wallet ID |
+| `destinationChain` | `Arbitrum \| Avalanche \| Base \| Ethereum \| Optimism \| Polygon \| Solana \| Stellar \| Tron` | Yes | Destination blockchain network |
+| `destinationCurrency` | `DAI \| EURC \| PYUSD \| USDB \| USDC \| USDP \| USDT` | Yes | Destination currency to receive |
+| `destinationAddress` | `string` | Yes | Destination address to receive crypto |
+| `amount` | `string` | Yes | Amount to offramp |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `method` | `evm \| solana` |  |
+| `walletIndex` | `number` |  |
+| `workflowId` | `string` |  |
+| `hashToSign` | `string` |  |
+| `payload` | `string` |  |
+| `deadline` | `string` |  |
+
+
+---
+
+## Offramp V2
+
+### Create offramp to Nigerian bank account with quote
+
+```http
+POST /v2/offramp/nigeria
+```
+
+Creates an offramp transaction to a Nigerian bank account and returns detailed quote information including exchange rates and amounts
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `sourceWalletId` | `string` | Yes | Source wallet ID to offramp from |
+| `bankAccountId` | `string` | Yes | Bank account ID to receive funds |
+| `fromAmount` | `string` | Yes | Amount of USDB to offramp |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `signatureRequest` | `object` | Signature request details |
+| `quote` | `object` | Quote details |
+
+
+---
+
+
+### Create offramp to crypto with quote
+
+```http
+POST /v2/offramp/crypto
+```
+
+Creates an offramp transaction to crypto and returns detailed quote information
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `sourceWalletId` | `string` | Yes | Source wallet ID |
+| `destinationChain` | `Arbitrum \| Avalanche \| Base \| Ethereum \| Optimism \| Polygon \| Solana \| Stellar \| Tron` | Yes | Destination blockchain network |
+| `destinationCurrency` | `DAI \| EURC \| PYUSD \| USDB \| USDC \| USDP \| USDT` | Yes | Destination currency to receive |
+| `destinationAddress` | `string` | Yes | Destination address to receive crypto |
+| `amount` | `string` | Yes | Amount to offramp |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `signatureRequest` | `object` | Signature request details |
+| `quote` | `object` | Quote details |
+
+
+---
+
+## Offramp - China
+
+### Get China payout options
+
+```http
+GET /offramp/china/options
+```
+
+Returns available options for bank names, remittance purposes, and destination currencies for China payout
+
+
+---
+
+
+### Create and submit China offramp in one request
+
+```http
+POST /offramp/china/create-and-submit
+```
+
+Creates a China offramp draft, uploads invoices (1-5 required), and submits it for processing in a single atomic operation. If any step fails, all changes are rolled back. Returns signature request and quote.
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `signatureRequest` | `object` | Signature request details |
+| `quote` | `object` | Quote details |
+
+
+---
+
+
+### Create and submit China offramp V2 (uses counterparties)
+
+```http
+POST /offramp/china/v2/create-and-submit
+```
+
+Creates a China offramp transaction using pre-created counterparties. The receiver counterparty ID references an existing beneficiary with bank details. This reduces redundancy and enables beneficiary reuse.
+
+Prerequisites:
+- Sender counterparty: POST /conduit/counterparties/sender
+- Receiver counterparty: POST /conduit/counterparties/receiver
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `signatureRequest` | `object` | Signature request details |
+| `quote` | `object` | Quote details |
+
+
+---
+
+## Offramp - China NGN
+
+### Create and submit China NGN/CNY offramp
+
+```http
+POST /offramp/china-ngn/create-and-submit
+```
+
+Creates a China NGN/CNY offramp using a saved RMB receiver. Pass receiverId (rmb_<uuid> from POST /conduit/counterparties/receiver with destinationCurrency: RMB). Beneficiary details are loaded from the receiver; no need to send account name, bank, or phone. Requires 1-5 invoice files (JPEG, PNG, or PDF). Returns a signature request for the on-chain transfer.
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `signatureRequest` | `object` | Signature request details |
+| `quote` | `object` |  |
+
+
+---

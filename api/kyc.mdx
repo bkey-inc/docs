@@ -1,0 +1,311 @@
+---
+title: KYC
+description: Know-Your-Customer profile management, document uploads, and activation.
+---
+
+<Warning>
+  The BKey API is in **active development**. Endpoints and schemas may change without notice.
+</Warning>
+
+
+### Get KYC profile
+
+```http
+GET /kyc/profile
+```
+
+Retrieves the KYC profile for the authenticated user, including all associated personal info, address, documents, and employment data.
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `kycProfileId` | `string` | KYC profile ID |
+| `bkeyUserId` | `string` | User ID |
+| `status` | `not_started \| in_progress \| pending_review \| completed \| rejected` | KYC profile status |
+| `completedAt` | `string \| null` | Completion timestamp |
+| `personalInfo` | `object` | Personal information |
+| `address` | `object` | Address information |
+| `identificationNumbers` | `object[]` | Identification numbers |
+| `identificationDocuments` | `object[]` | Identification documents |
+| `proofOfAddressDocuments` | `object[]` | Proof of address documents |
+| `biometricDocuments` | `object[]` | Biometric documents |
+| `createdAt` | `string` | Creation timestamp |
+| `updatedAt` | `string` | Last update timestamp |
+
+
+---
+
+
+### Update KYC profile with partial data
+
+```http
+PATCH /kyc/profile
+```
+
+Accepts partial KYC data and merges with existing profile. All fields are optional. Returns what was saved and if profile can be activated.
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `personalInfo` | `object` | No |  |
+| `address` | `object` | No |  |
+| `employment` | `object` | No |  |
+| `sourceOfFunds` | `salary \| business \| investments \| pension \| government \| inheritance \| savings` | No |  |
+| `estimatedMonthlyVolume` | `number` | No |  |
+| `accountPurpose` | `personal \| business \| investment` | No |  |
+| `actingAsIntermediary` | `boolean` | No |  |
+| `identificationNumbers` | `object[]` | No |  |
+| `bridgeSignedAgreementId` | `string` | No |  |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `success` | `boolean` |  |
+| `saved` | `object` |  |
+| `errors` | `object[]` |  |
+| `canActivate` | `boolean` |  |
+| `missing` | `string[]` |  |
+
+
+---
+
+
+### Search occupations
+
+```http
+GET /kyc/occupations
+```
+
+Searches for occupations by name or alias. Returns a list of active occupations matching the search criteria.
+
+
+**Query parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `search` | `string` | Yes |  |
+
+---
+
+
+### Get KYC field options
+
+```http
+GET /kyc/options
+```
+
+Returns all available options for KYC fields including genders, employment statuses, income sources, identification types, and account purposes.
+
+
+---
+
+
+### Generate Bridge TOS signing URL
+
+```http
+GET /kyc/bridge-agreement-url
+```
+
+Generates a URL for the user to sign the Bridge Terms of Service agreement. The signed agreement ID is required before Bridge provisioning.
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `url` | `string` | The Bridge TOS signing URL |
+
+
+---
+
+
+### Store Bridge agreement ID
+
+```http
+POST /kyc/bridge-agreement
+```
+
+Stores the signed agreement ID after the user completes the Bridge TOS signing process.
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `signedAgreementId` | `string` | Yes |  |
+
+
+---
+
+
+### Upload physical identification document with images
+
+```http
+POST /kyc/identification-documents
+```
+
+Upload a physical identification document using multipart/form-data. Send files as "files" field and document data as form fields. Front image is required, back image is optional.
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `type` | `passport \| drivers_license \| national_id \| government_id \| other` | Yes | Type of identification document |
+| `documentNumber` | `string` | Yes | Document number |
+| `issuingCountry` | `string` | Yes |  |
+| `expirationDate` | `string` | No | Document expiration date |
+| `issueDate` | `string` | No | Document issue date |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | `string` | Document unique identifier |
+| `type` | `passport \| drivers_license \| national_id \| government_id \| other` | Type of identification document |
+| `documentNumber` | `string` | Document number |
+| `issuingCountryCode` | `string` | Country that issued the document |
+| `expirationDate` | `string` | Document expiration date |
+| `issueDate` | `string` | Document issue date |
+| `status` | `pending \| verified \| rejected \| expired` | Document verification status |
+| `verificationNotes` | `string` | Notes from verification process |
+| `verifiedAt` | `string` | Verification timestamp |
+| `verifiedBy` | `string` | Verifier identifier |
+| `createdAt` | `string` | Creation timestamp |
+| `updatedAt` | `string` | Last update timestamp |
+
+
+---
+
+
+### Upload proof of address document
+
+```http
+POST /kyc/proof-of-address-documents
+```
+
+Upload a proof of address document using multipart/form-data. Send files as "files" field and document data as form fields. Front image is required, additional image is optional.
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `type` | `utility_bill \| bank_statement \| rental_agreement \| tax_document \| other` | Yes | Type of proof of address document |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | `string` | Document unique identifier |
+| `type` | `utility_bill \| bank_statement \| rental_agreement \| tax_document \| other` | Type of proof of address |
+| `createdAt` | `string` | Creation timestamp |
+| `updatedAt` | `string` | Last update timestamp |
+
+
+---
+
+
+### Upload biometric document
+
+```http
+POST /kyc/biometric-documents
+```
+
+Upload a biometric document using multipart/form-data. Send selfie file as "selfie" field and document data as form fields.
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `type` | `selfie \| liveness_check \| video_verification \| enrollment \| recovery_enrollment \| recovery_blocked_attempt` | Yes | Type of biometric document |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | `string` | Document unique identifier |
+| `type` | `selfie \| liveness_check \| video_verification \| enrollment \| recovery_enrollment \| recovery_blocked_attempt` | Type of biometric |
+| `createdAt` | `string` | Creation timestamp |
+| `updatedAt` | `string` | Last update timestamp |
+
+
+---
+
+
+### Lookup BVN data without saving
+
+```http
+GET /kyc/bvn-lookup/{bvn}
+```
+
+For Nigerian users: Fetches BVN data from QoreID registry for preview without updating the KYC profile. The phone number verification is done against the authenticated user.
+
+
+**Path parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `bvn` | `string` | Yes |  |
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | `number` |  |
+| `status` | `object` |  |
+| `bvn` | `object` |  |
+
+
+---
+
+
+### Check if profile is ready for activation
+
+```http
+GET /kyc/readiness
+```
+
+Returns whether the profile has all required data for activation and what is missing
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `ready` | `boolean` |  |
+| `missing` | `string[]` |  |
+
+
+---
+
+
+### Activate KYC profile
+
+```http
+POST /kyc/activate
+```
+
+Submit profile to providers for activation. Profile must be complete before activation.
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `activated` | `boolean` |  |
+| `message` | `string` |  |
+| `idenfyUrl` | `string` | iDenfy verification URL for PayTrie KYC (Canada only) |
+
+
+---

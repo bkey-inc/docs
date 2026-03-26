@@ -1,0 +1,191 @@
+---
+title: Authentication
+description: WebAuthN challenge-response flow for obtaining session tokens.
+---
+
+<Warning>
+  The BKey API is in **active development**. Endpoints and schemas may change without notice.
+</Warning>
+
+
+## Authentication
+
+### Get WebAuthN challenge
+
+```http
+POST /auth/get-challenge
+```
+
+Generate a WebAuthN challenge for the user with the given identity ID. Cleans up any existing challenges for the user.
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `identityId` | `string` | Yes | Identity ID of the user |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `challengeId` | `string` | Unique challenge identifier |
+| `challenge` | `string` | Challenge string to be signed |
+| `expiresAt` | `string` | Challenge expiration time (ISO 8601 format) |
+
+
+---
+
+
+### Get WebAuthN challenge by public key
+
+```http
+POST /auth/get-challenge-by-public-key
+```
+
+Generate a WebAuthN challenge for the user with the given public key. Cleans up any existing challenges for the user.
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `publicKey` | `string` | Yes | Public key of the user |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `challengeId` | `string` | Unique challenge identifier |
+| `challenge` | `string` | Challenge string to be signed |
+| `expiresAt` | `string` | Challenge expiration time (ISO 8601 format) |
+
+
+---
+
+
+### [LEGACY] Submit signed challenge
+
+```http
+POST /auth/submit-signed-challenge
+```
+
+[DEPRECATED] Submit a signed challenge for verification to complete WebAuthN authentication without device tracking. Use v2/submit-signed-challenge for enhanced security with device-bound sessions.
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `challengeId` | `string` | Yes | Unique challenge identifier |
+| `signedChallenge` | `string` | Yes | Signed challenge as hex string |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `success` | `boolean` | Authentication success status |
+| `message` | `string` | Success message |
+| `token` | `string` | JWT session token |
+| `recoveryToken` | `string` | Recovery JWT token |
+| `expiresIn` | `number` | Session token expiration time in seconds |
+| `user` | `object` | Full user details |
+
+
+---
+
+
+### [V2] Submit signed challenge with device info
+
+```http
+POST /auth/v2/submit-signed-challenge
+```
+
+Submit a signed challenge for verification to complete WebAuthN authentication. Includes device tracking for enhanced security and session management.
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `challengeId` | `string` | Yes | Unique challenge identifier |
+| `signedChallenge` | `string` | Yes | Signed challenge as hex string |
+| `deviceId` | `string` | Yes | Unique device identifier UUID |
+| `deviceModel` | `string` | No | Device model information |
+| `appVersion` | `string` | No | Application version |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `success` | `boolean` | Authentication success status |
+| `message` | `string` | Success message |
+| `token` | `string` | JWT session token |
+| `recoveryToken` | `string` | Recovery JWT token |
+| `expiresIn` | `number` | Session token expiration time in seconds |
+| `user` | `object` | Full user details |
+
+
+---
+
+## OTP
+
+### Send OTP to user via email/SMS/WhatsApp
+
+```http
+POST /otp/send
+```
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `type` | `account_recovery \| account_backup_recovery \| contact_info_verification` | Yes | Type of OTP being requested |
+| `channel` | `sms \| email \| whatsapp` | Yes | Channel to send OTP through |
+| `contactInfo` | `string` | Yes | Contact information (email address or phone number) |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `success` | `boolean` | Success status |
+| `message` | `string` | Response message |
+| `otpId` | `string` | OTP ID for verification |
+| `expiresInMinutes` | `number` | Expiration time in minutes |
+
+
+---
+
+
+### Verify OTP code
+
+```http
+POST /otp/verify
+```
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `otpId` | `string` | Yes | OTP ID received from send OTP response |
+| `code` | `string` | Yes | 6-digit OTP code |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `success` | `boolean` | Verification success status |
+| `message` | `string` | Response message |
+| `remainingAttempts` | `number` | Remaining attempts if verification failed |
+| `token` | `string` | JWT token for successful OTP verification (valid for 10 minutes) |
+
+
+---

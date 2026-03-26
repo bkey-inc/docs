@@ -1,0 +1,62 @@
+---
+title: API Overview
+description: BKey API — base URL, authentication, response format, and error handling.
+---
+
+<Warning>
+  The BKey API is in **active development**. Endpoints and schemas may change without notice.
+</Warning>
+
+
+## Base URL
+
+All API endpoints are relative to the BKey API base URL. Contact the BKey team for your environment's base URL.
+
+## Authentication
+
+Most endpoints require a bearer token obtained from the Authentication flow.
+
+```http
+Authorization: Bearer <token>
+```
+
+## Response envelope
+
+Successful responses return an `ok: true` result envelope:
+
+```json
+{
+  "ok": true,
+  "value": { ... }
+}
+```
+
+Errors return `ok: false`:
+
+```json
+{
+  "ok": false,
+  "error": {
+    "type": "VALIDATION_ERROR",
+    "message": "Wallet ID is required"
+  }
+}
+```
+
+## HTTP error codes
+
+| Code | Meaning |
+|------|---------|
+| `400` | Validation error — check request body or parameters |
+| `401` | Unauthorised — missing or invalid bearer token |
+| `402` | Payment required — fee must be paid to proceed |
+| `403` | Forbidden — insufficient permissions |
+| `404` | Resource not found |
+| `409` | Conflict — resource already exists |
+| `422` | Unprocessable — business rule violation |
+| `5XX` | Server or external service error |
+
+<Warning>
+  The BKey API is in **active development**. Endpoint shapes, response formats,
+  and versioning are subject to change without notice.
+</Warning>

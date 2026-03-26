@@ -1,0 +1,307 @@
+---
+title: Conduit
+description: Conduit customer onboarding, counterparties, documents, and supported banks.
+---
+
+<Warning>
+  The BKey API is in **active development**. Endpoints and schemas may change without notice.
+</Warning>
+
+
+### List Conduit customers
+
+```http
+GET /conduit/customers
+```
+
+Lists all customers from Conduit. Use this to find the customer ID for counterparty creation.
+
+
+**Query parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `pageSize` | `number` | No | Number of items per page (default: 50) |
+| `pageAfter` | `string` | No | Cursor for pagination (customer ID to start after) |
+
+---
+
+
+### Create customer onboarding draft
+
+```http
+POST /conduit/customers/onboarding
+```
+
+Creates a new customer onboarding draft with Section 1 (Business Identity) data. Returns an internal onboarding ID for subsequent updates.
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `businessLegalName` | `string` | Yes | Legal name of the business |
+| `country` | `string` | Yes | ISO 3166-1 alpha-3 country code |
+| `registeredDate` | `string` | Yes | Business registration date (YYYY-MM-DD) |
+| `website` | `string` | No | Company website URL |
+| `taxIdentificationNumber` | `string` | Yes | Tax identification number (EIN) |
+| `businessEntityId` | `string` | Yes | Business entity ID |
+| `email` | `string` | Yes | Business email address |
+| `phone` | `string` | Yes | Phone number with country code |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `onboardingId` | `string` | Internal onboarding record ID |
+| `status` | `string` | Current onboarding status |
+| `currentStep` | `number` | Current form step |
+
+
+---
+
+
+### Get onboarding status
+
+```http
+GET /conduit/customers/onboarding/status
+```
+
+Returns the current onboarding status and step for the authenticated user.
+
+
+---
+
+
+### Get customer onboarding record
+
+```http
+GET /conduit/customers/onboarding/{id}
+```
+
+Returns the full onboarding record including all sections and relations. Used for the review screen and resuming the form.
+
+
+**Path parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `id` | `string` | Yes | Internal onboarding ID |
+
+---
+
+
+### Update customer onboarding draft
+
+```http
+PATCH /conduit/customers/onboarding/{id}
+```
+
+Updates the onboarding draft with addresses, control person, or identity info. Only works while status is "draft".
+
+
+**Path parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `id` | `string` | Yes | Internal onboarding ID |
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `registeredAddress` | `object` | No |  |
+| `operatingAddress` | `object` | No |  |
+| `sameAsRegisteredAddress` | `boolean` | No | Operating address same as registered |
+| `controlPerson` | `object` | No |  |
+| `identityInfo` | `object` | No |  |
+| `currentStep` | `number` | No | Current form step (1-6) |
+
+
+---
+
+
+### Upload KYB or KYC document
+
+```http
+POST /conduit/customers/onboarding/{id}/documents
+```
+
+Uploads a document for the onboarding record. Requires purpose ("kyb" for business docs, "kyc" for identity docs), type (e.g. "certificate_of_registration", "passport"), and name. Accepts JPG, PNG, or PDF (max 10MB). Documents are stored locally and uploaded to Conduit during submission.
+
+
+**Path parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `id` | `string` | Yes | Internal onboarding ID |
+
+---
+
+
+### Submit customer for onboarding
+
+```http
+POST /conduit/customers/onboarding/{id}/submit
+```
+
+Submits the completed onboarding form to Conduit. Orchestrates creating the customer, uploading documents, adding control persons, and submitting for review.
+
+
+**Path parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `id` | `string` | Yes | Internal onboarding ID |
+
+---
+
+
+### Upload document
+
+```http
+POST /conduit/documents
+```
+
+Uploads a document to Conduit. Returns a document ID that can be used when creating or updating counterparties. Supported formats: PDF, PNG, JPG.
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | `string` | The document ID to use when creating/updating counterparties |
+
+
+---
+
+
+### Get sender counterparty
+
+```http
+GET /conduit/sender-counterparty
+```
+
+Retrieves the sender counterparty for the authenticated user. Returns null if no sender counterparty exists. Used to pre-fill the KYC form.
+
+
+---
+
+
+### List receiver counterparties
+
+```http
+GET /conduit/receiver-counterparties
+```
+
+Lists all added receiver counterparties for the authenticated user. Receiver counterparties represent beneficiaries who receive fiat payments in offramp transactions. Counterparties are scoped to users.
+
+
+---
+
+
+### Get counterparty
+
+```http
+GET /conduit/counterparties/{id}
+```
+
+Retrieves a specific counterparty by ID for the authenticated user. Only returns counterparties owned by the authenticated user.
+
+
+**Path parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `id` | `string` | Yes | The counterparty ID (e.g., cp_2ofTA13AD0xBtbEvBl20aEb1hEu) |
+
+---
+
+
+### Update counterparty
+
+```http
+PATCH /conduit/counterparties/{id}
+```
+
+Updates an existing counterparty with partial data. You can update business or individual counterparties. All fields are optional - only include the fields you want to update.
+
+
+**Path parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `id` | `string` | Yes | The counterparty ID to update |
+
+**Request body**
+
+
+---
+
+
+### Delete counterparty
+
+```http
+DELETE /conduit/counterparties/{id}
+```
+
+Deletes an existing counterparty by ID for the authenticated user. Only allows deleting counterparties owned by the authenticated user.
+
+
+**Path parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `id` | `string` | Yes | The counterparty ID to delete |
+
+---
+
+
+### Create receiver counterparty
+
+```http
+POST /conduit/counterparties/receiver
+```
+
+Creates a receiver counterparty with a bank account as the fiat payment method for the authenticated user. Used for offramp transactions where we pay fiat to the beneficiary. Counterparties are scoped to users.
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `idempotencyKey` | `string` | Yes | Unique key to ensure idempotent counterparty creation |
+| `destinationCurrency` | `string` | Yes | Destination currency code |
+| `beneficiary` | `object` | Yes |  |
+| `senderId` | `string` | No | Conduit counterparty ID of the sender |
+
+
+---
+
+
+### List supported banks
+
+```http
+GET /conduit/banks
+```
+
+Returns a list of banks supported by Conduit for various payment rails. Can be filtered by country code (ISO 3166-1 alpha-3) or currency code. Currently supports: Brazil (BRL/TED), Colombia (COP/ACH), and China (USD/SWIFT).
+
+
+**Query parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `countryCode` | `string` | No | Filter by ISO 3166-1 alpha-3 country code (e.g., BRA, COL, CHN) |
+| `currency` | `string` | No | Filter by currency code (e.g., BRL, COP, USD) |
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `banks` | `object[]` | Supported banks organized by country |
+| `total` | `number` | Total number of bank entries |
+
+
+---

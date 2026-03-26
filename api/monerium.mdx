@@ -1,0 +1,134 @@
+---
+title: Monerium
+description: Euro on/offramp via Monerium.
+---
+
+<Warning>
+  The BKey API is in **active development**. Endpoints and schemas may change without notice.
+</Warning>
+
+
+### Handle Monerium webhook event
+
+```http
+POST /monerium/webhook
+```
+
+Receives signed webhook callbacks from Monerium (e.g. customer, profile, order, or IBAN updates). Signature is validated before processing.
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `success` | `boolean` | Indicates successful webhook processing |
+
+
+---
+
+
+### Complete Monerium KYC flow
+
+```http
+POST /monerium/complete-kyc
+```
+
+Finishes the OAuth PKCE onboarding step by signaling the user Monerium onboarding workflow with the authorization code and signature.
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `code` | `string` | Yes | Authorization code returned by Monerium |
+| `signature` | `string` | Yes | Signature for Monerium authentication |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `success` | `boolean` | Whether the operation completed successfully |
+| `message` | `string` | Human-readable result description |
+
+
+---
+
+
+### Complete Monerium order
+
+```http
+POST /monerium/orders/complete
+```
+
+Completes a Monerium order by submitting the signed order message to the place-order workflow.
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `workflowId` | `string` | Yes | Monerium workflow ID |
+| `signature` | `string` | Yes | Signature |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `success` | `boolean` | Whether the operation completed successfully |
+| `message` | `string` | Human-readable result description |
+
+
+---
+
+
+### Prepare Monerium redeem order
+
+```http
+POST /monerium/orders/prepare
+```
+
+Starts a place-order workflow and returns workflowId and messageToSign. If international payout fee applies, signatureRequest is included for the fee child workflow. Sign the order message with the wallet specified by walletId, then POST to /monerium/orders/complete with { workflowId, signature }.
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `walletId` | `string` | Yes | ID of the wallet to redeem from |
+| `amount` | `string` | Yes | Quantity of money to redeem |
+| `counterpart` | `object` | Yes |  |
+| `memo` | `string \| null` | No |  |
+| `supportingDocumentId` | `string \| null` | No | Required for orders >= EUR 15,000 |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `workflowId` | `string` | Monerium offramp workflow ID for order completion |
+| `messageToSign` | `string` | Message to sign for the Monerium offramp amount |
+| `signatureRequest` | `object` | Present when international payout fee is greater than 0 |
+
+
+---
+
+
+### Upload Monerium document
+
+```http
+POST /monerium/upload-file
+```
+
+Uploads a PDF or JPEG file to Monerium for KYC verification or redeem-order supporting documentation. Returns fileId for follow-up requests.
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `fileId` | `string` | Monerium file id for use in KYC or order APIs |
+
+
+---

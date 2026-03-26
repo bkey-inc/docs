@@ -1,0 +1,147 @@
+---
+title: Notifications
+description: Push notification preferences, device registration, and in-app announcements.
+---
+
+<Warning>
+  The BKey API is in **active development**. Endpoints and schemas may change without notice.
+</Warning>
+
+
+## Notifications
+
+### Get notification preferences
+
+```http
+GET /notifications/preferences
+```
+
+
+---
+
+
+### Update notification preferences
+
+```http
+PUT /notifications/preferences
+```
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `pushEnabled` | `boolean` | No |  |
+| `smsEnabled` | `boolean` | No |  |
+| `emailEnabled` | `boolean` | No |  |
+| `transactions` | `boolean` | No |  |
+| `moneyRequests` | `boolean` | No |  |
+| `kycUpdates` | `boolean` | No |  |
+| `security` | `boolean` | No |  |
+| `marketing` | `boolean` | No |  |
+
+
+---
+
+
+### Register device for push notifications
+
+```http
+POST /notifications/device/register
+```
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `playerId` | `string` | Yes | OneSignal Player ID that uniquely identifies this device for push notifications |
+| `platform` | `ios \| android` | Yes | Mobile platform of the device |
+| `deviceModel` | `string` | No | Device model (e.g., iPhone 14 Pro) |
+| `appVersion` | `string` | No | App version (e.g., 1.2.3) |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `registered` | `boolean` | Whether device was successfully registered |
+| `deviceId` | `string` | Optional device identifier |
+
+
+---
+
+## Announcements
+
+### AnnouncementsController_create
+
+```http
+POST /announcements
+```
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `title` | `string` | Yes | Announcement title |
+| `content` | `string` | Yes | Announcement content |
+| `metadata` | `object` | No | Optional JSON metadata |
+| `targetUserIds` | `string[]` | No | Target user IDs when not global |
+| `isGlobal` | `boolean` | No | Whether announcement targets all users |
+
+
+---
+
+
+### AnnouncementsController_findAll
+
+```http
+GET /announcements
+```
+
+
+---
+
+
+### AnnouncementsController_markAsRead
+
+```http
+POST /announcements/read
+```
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `announcementId` | `string` | Yes | Announcement ID to mark as read |
+
+
+---
+
+
+### AnnouncementsController_getUnreadCount
+
+```http
+GET /announcements/unread
+```
+
+
+---
+
+
+### AnnouncementsController_delete
+
+```http
+DELETE /announcements/{id}
+```
+
+
+**Path parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `id` | `string` | Yes |  |
+
+---

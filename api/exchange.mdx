@@ -1,0 +1,175 @@
+---
+title: Exchange
+description: Exchange rates and swap quotes between currencies.
+---
+
+<Warning>
+  The BKey API is in **active development**. Endpoints and schemas may change without notice.
+</Warning>
+
+
+### Get exchange rate
+
+```http
+GET /exchange/rate/{fromCurrency}/{toCurrency}
+```
+
+Get the current exchange rate between two currencies. Tier-based premiums are applied. Optionally specify a tier to preview rates.
+
+
+**Path parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `fromCurrency` | `USD \| NGN \| CAD \| EUR \| GBP \| MXN \| CNY` | Yes | Currency to convert from |
+| `toCurrency` | `USD \| NGN \| CAD \| EUR \| GBP \| MXN \| CNY` | Yes | Currency to convert to |
+
+**Query parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `tier` | `BRONZE \| SILVER \| GOLD \| PLATINUM` | No | Optional tier override for rate preview |
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `exchangeRate` | `string` | Exchange rate |
+| `fromCurrency` | `USD \| NGN \| CAD \| EUR \| GBP \| MXN \| CNY` | Source currency |
+| `toCurrency` | `USD \| NGN \| CAD \| EUR \| GBP \| MXN \| CNY` | Destination currency |
+
+
+---
+
+
+### Get swap quote
+
+```http
+POST /exchange/quote
+```
+
+Get a detailed swap quote including exchange rate and fee breakdown. This is a non-binding estimate.
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `swapAmount` | `object \| object` | Yes | Swap amount specification - either exactIn or exactOut |
+| `fromCurrency` | `USD \| NGN \| CAD \| EUR \| GBP \| MXN \| CNY` | Yes | Currency to convert from (includes CNY for display) |
+| `toCurrency` | `USD \| NGN \| CAD \| EUR \| GBP \| MXN \| CNY` | Yes | Currency to convert to (includes CNY for display) |
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `fromCurrency` | `USD \| NGN \| CAD \| EUR \| GBP \| MXN \| CNY` | Source currency |
+| `toCurrency` | `USD \| NGN \| CAD \| EUR \| GBP \| MXN \| CNY` | Destination currency |
+| `amountIn` | `string` | Amount to send |
+| `amountOut` | `string` | Amount to receive |
+| `exchangeRate` | `string` | Exchange rate (fee-adjusted if applicable). For USD pairs: non-USD per 1 USD. For direct pairs: fromCurrency per 1 toCurrency (e.g. NGN→CNY ~203 means 1 CNY costs 203 NGN). |
+| `toUsdExchangeRate` | `string` | Exchange rate to USD (fee-adjusted if applicable) |
+| `fees` | `object[]` | Breakdown of fees applied |
+
+
+---
+
+
+### Set manual exchange rate
+
+```http
+POST /exchange/admin/rates/manual
+```
+
+Set a daily manual exchange rate for a currency pair. Upserts if a rate already exists for the given date.
+
+
+**Request body**
+
+| Field | Type | Required | Description |
+| ----- | ---- | -------- | ----------- |
+| `baseCurrency` | `USD \| EUR \| NGN \| CNY \| CAD \| GBP \| MXN` | Yes | Base currency (e.g., NGN) |
+| `quoteCurrency` | `USD \| EUR \| NGN \| CNY \| CAD \| GBP \| MXN` | Yes | Quote currency (e.g., CNY) |
+| `rate` | `string` | Yes | Exchange rate: quote per 1 base. For NGN/CNY use base=CNY, quote=NGN so rate = NGN per 1 CNY (avoids precision loss). |
+| `effectiveDate` | `string` | Yes | Date this rate is valid for (YYYY-MM-DD) |
+| `note` | `string` | No | Optional note about the rate |
+
+
+---
+
+
+### Get current manual exchange rate
+
+```http
+GET /exchange/admin/rates/manual
+```
+
+Get the manual exchange rate for today. Falls back to the latest available rate if today's rate is not set.
+
+
+**Query parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `base` | `USD \| EUR \| NGN \| CNY \| CAD \| GBP \| MXN` | Yes | Base currency |
+| `quote` | `USD \| EUR \| NGN \| CNY \| CAD \| GBP \| MXN` | Yes | Quote currency |
+
+---
+
+
+### Get manual exchange rate history
+
+```http
+GET /exchange/admin/rates/manual/history
+```
+
+Get the history of manual exchange rates for a currency pair, ordered by most recent first.
+
+
+**Query parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `base` | `USD \| EUR \| NGN \| CNY \| CAD \| GBP \| MXN` | Yes | Base currency |
+| `quote` | `USD \| EUR \| NGN \| CNY \| CAD \| GBP \| MXN` | Yes | Quote currency |
+| `limit` | `integer` | No | Number of records to return |
+
+---
+
+
+### List China NGN payouts
+
+```http
+GET /exchange/admin/china-ngn-payouts
+```
+
+List China NGN/CNY payout transactions. Filter by status. Returns only NGN partner payouts (excludes Conduit/USD route).
+
+
+**Query parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `status` | `string` | Yes |  |
+| `limit` | `string` | Yes |  |
+
+---
+
+
+### Update China NGN payout status
+
+```http
+PATCH /exchange/admin/china-ngn-payouts/{transactionId}
+```
+
+Mark a China NGN payout as completed or failed. Admin-only.
+
+
+**Path parameters**
+
+| Parameter | Type | Required | Description |
+| --------- | ---- | -------- | ----------- |
+| `transactionId` | `string` | Yes |  |
+
+---

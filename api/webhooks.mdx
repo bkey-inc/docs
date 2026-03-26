@@ -1,0 +1,96 @@
+---
+title: Webhooks
+description: Inbound webhook handlers for Anchor, Blockradar, Bridge, Conduit, Conversations, and PayTrie.
+---
+
+<Warning>
+  The BKey API is in **active development**. Endpoints and schemas may change without notice.
+</Warning>
+
+
+## Anchor
+
+### AnchorController_handleWebhook
+
+```http
+POST /anchor/webhook
+```
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `success` | `boolean` | Indicates successful webhook processing |
+
+
+---
+
+## BlockradarWebhook
+
+### BlockradarWebhookController_handleWebhook
+
+```http
+POST /blockradar/webhook
+```
+
+
+---
+
+## Bridge
+
+### BridgeController_handleWebhook
+
+```http
+POST /bridge/webhook
+```
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `success` | `boolean` | Indicates successful webhook processing |
+
+
+---
+
+## Conduit Webhooks
+
+### Receive Conduit webhook events
+
+```http
+POST /conduit/webhook
+```
+
+Endpoint for receiving webhook events from Conduit for transaction and counterparty status updates. Requests are authenticated via HMAC SHA-256 signature in the conduit-signature header.
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `success` | `boolean` | Indicates successful webhook processing |
+
+
+---
+
+## Conversations Webhooks
+
+### Receive Stream webhook events
+
+```http
+POST /conversations/webhook
+```
+
+Endpoint for receiving webhook events from Stream for messaging and conversation updates
+
+
+**Response**
+
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `success` | `boolean` | Indicates successful webhook processing |
+
+
+---
