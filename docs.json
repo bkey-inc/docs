@@ -76,8 +76,7 @@
           "api/recovery",
           "api/webhooks",
           "api/conduit",
-          "api/gas",
-          "api/admin"
+          "api/gas"
         ]
       }
     ]
