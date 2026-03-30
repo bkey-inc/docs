@@ -1,98 +1,442 @@
 ---
 title: "Wallet & card layouts"
-description: "Generic wallet- and card-style layout primitives in bkey_uikit, plus where full wallet card UI lives."
+description: "Embedded wallet widgets, state notifiers, data models, and contracts from bmoni_embedded_wallets_cards."
 ---
 
-This page exists to make one package boundary explicit:
+<Warning>
+  This package is in **active development**. APIs, models, and widget
+  signatures may change without notice.
+</Warning>
 
-- `bkey_uikit` documents the **generic UI primitives**
-- `bmoni_embedded_wallets_cards` owns the **wallet/card-aware composed widgets, models, and providers**
+The `bmoni_embedded_wallets_cards` package provides the wallet-aware UI layer,
+state management, and data contracts that sit between the generic `bkey_uikit`
+primitives and the host application.
 
-If you are looking for full wallet card UI, transaction sections, or embedded wallet flows, start here first and then jump to the embedded package.
+## Installation
 
-## Where wallet cards live
-
-`bkey_uikit` does **not** own the full `WalletCard` feature widget from `bmoni-mobile`.
-
-Instead, it provides the visual building blocks that wallet- and card-aware packages compose:
-
-- `PageDotsIndicator`
-- `BouncingPageViewPhysics`
-- `SectionHeader`
-- `ActivitySectionCard`
-
-The feature-aware layer currently lives in `bmoni_embedded_wallets_cards`, which builds on top of these primitives.
-
-## Generic primitives in `bkey_uikit`
-
-### PageDotsIndicator
-
-Use this for wallet or card carousels where the host or feature package owns the actual page content.
-
-```dart
-const PageDotsIndicator(
-  pageCount: 3,
-  currentPage: 1,
-  caption: 'Swipe',
-)
+```yaml
+# pubspec.yaml
+dependencies:
+  bmoni_embedded_wallets_cards:
+    path: ../bmoni_embedded_wallets_cards
 ```
 
-### BouncingPageViewPhysics
+The package depends on `bkey_uikit`, `flutter_riverpod`, `dartz`,
+`equatable`, and `json_annotation`.
 
-Use this when you want page-view bounce behavior without embedding wallet logic into the UI kit.
+## Architecture
 
-```dart
-PageView(
-  physics: const BouncingPageViewPhysics(),
-  children: const [Placeholder(), Placeholder()],
-)
+```
+┌─────────────────────────────────────────────────┐
+│  Host app (bmoni-mobile)                        │
+│  ─ Riverpod providers, routing, l10n, callbacks │
+├─────────────────────────────────────────────────┤
+│  bmoni_embedded_wallets_cards                   │
+│  ─ StateNotifiers, models, contracts, widget    │
+├─────────────────────────────────────────────────┤
+│  bkey_uikit                                     │
+│  ─ Design tokens, layout primitives, theme      │
+└─────────────────────────────────────────────────┘
 ```
 
-### SectionHeader
+The host app is responsible for:
 
-Use this for titled wallet/card sections with optional actions like “View all”.
+- Wiring `StateNotifier`s into Riverpod providers
+- Implementing the abstract contracts (data source, storage, balance cache)
+- Providing `itemBuilder` and `emptyState` widgets
+- Routing, localisation, and analytics
+
+---
+
+## Widgets
+
+### EmbeddedWalletTransactionsSection
+
+The main composed widget. Renders a transaction list inside an
+`ActivitySectionCard` (from `bkey_uikit`) with loading, empty, and populated
+states.
 
 ```dart
-SectionHeader(
+EmbeddedWalletTransactionsSection(
+  transactions: walletTransactions,
   title: 'Recent activity',
-  trailing: GestureDetector(
-    onTap: () {},
-    child: const Text('View all'),
-  ),
+  emptyState: const Text('No transactions yet'),
+  itemBuilder: (context, tx) => TransactionTile(transaction: tx),
+  viewAllLabel: 'View all',
+  onViewAll: () => navigateToFullHistory(),
+  maxItems: 5,
+  isRefreshing: false,
+  isInitialLoading: false,
 )
 ```
 
-### ActivitySectionCard
+**Parameters**
 
-Use this as the bordered shell for sections such as recent transactions, wallet activity, or card activity.
+| Parameter | Type | Required | Default | Description |
+| --------- | ---- | -------- | ------- | ----------- |
+| `transactions` | `List<EmbeddedWalletTransaction>` | Yes | | Transaction list to display |
+| `title` | `String` | Yes | | Section header title |
+| `emptyState` | `Widget` | Yes | | Widget shown when there are no transactions |
+| `itemBuilder` | `Widget Function(BuildContext, EmbeddedWalletTransaction)` | Yes | | Builds each transaction row |
+| `viewAllLabel` | `String?` | No | `null` | Label for the "View all" action |
+| `onViewAll` | `VoidCallback?` | No | `null` | Callback when "View all" is tapped |
+| `isRefreshing` | `bool` | No | `false` | Shows the previous list while refreshing to avoid flicker |
+| `isInitialLoading` | `bool` | No | `false` | Shows a loading indicator instead of the list |
+| `maxItems` | `int` | No | `5` | Maximum transactions to show before truncating |
+| `loadingHeight` | `double?` | No | `null` | Height of the loading placeholder |
+| `loadingWidget` | `Widget?` | No | `null` | Custom loading widget (replaces default spinner) |
+
+**Behaviour**
+
+- Sorts transactions by `createdAt` descending.
+- While `isRefreshing` is true, the widget holds onto the previous non-empty
+  list so the UI does not flicker empty.
+- "View all" appears in both the header and footer when `viewAllLabel` and
+  `onViewAll` are set and the list exceeds `maxItems`.
+
+---
+
+## State management
+
+The package ships three `StateNotifier` subclasses. The host app must wire
+them into Riverpod providers.
+
+### EmbeddedWalletListNotifier
+
+Manages the list of wallets for the current user.
 
 ```dart
-ActivitySectionCard(
-  header: const SectionHeader(title: 'Recent activity'),
-  child: const Padding(
-    padding: EdgeInsets.all(16),
-    child: Text('Section body'),
-  ),
+final notifier = EmbeddedWalletListNotifier(
+  walletDataSource: myDataSource,
+  storage: myStorage,
+);
+```
+
+**State: `EmbeddedWalletListState`**
+
+| Field | Type | Default | Description |
+| ----- | ---- | ------- | ----------- |
+| `isLoading` | `bool` | `false` | Whether wallets are being fetched |
+| `wallets` | `List<EmbeddedWallet>?` | `null` | Fetched wallet list |
+| `error` | `EmbeddedFailure?` | `null` | Error from the last fetch |
+| `isRefreshing` | `bool` | `false` | Pull-to-refresh in progress |
+| `initialWalletLoad` | `bool` | `false` | First-time load flag |
+| `notificationReceived` | `bool` | `false` | Push notification received flag |
+
+**Methods**
+
+| Method | Return | Description |
+| ------ | ------ | ----------- |
+| `fetchWallets({bool isRefresh})` | `Future<void>` | Fetch wallets from data source; caches result |
+| `setWallets(List<EmbeddedWallet>)` | `void` | Directly set wallet list |
+| `setInitialWalletLoad(bool)` | `void` | Toggle first-load flag |
+| `setNotificationReceived(bool)` | `void` | Toggle notification flag |
+| `getWalletById(String walletId)` | `Future<(EmbeddedFailure?, EmbeddedWalletDetailResponse?)>` | Fetch a single wallet's details |
+
+### EmbeddedWalletTransactionsNotifier
+
+Manages transaction history per wallet, keyed by wallet ID.
+
+```dart
+final notifier = EmbeddedWalletTransactionsNotifier(
+  walletDataSource: myDataSource,
+  storage: myStorage,
+);
+```
+
+**State: `EmbeddedWalletTransactionsState`**
+
+| Field | Type | Default | Description |
+| ----- | ---- | ------- | ----------- |
+| `isLoading` | `bool` | `false` | Whether transactions are being fetched |
+| `transactionsByWallet` | `Map<String, EmbeddedWalletTransactionsResponse>` | `{}` | Transaction responses keyed by wallet ID |
+| `error` | `EmbeddedFailure?` | `null` | Error from the last fetch |
+| `lastCachedAt` | `DateTime?` | `null` | Timestamp of the last cache read |
+
+**Methods**
+
+| Method | Return | Description |
+| ------ | ------ | ----------- |
+| `fetchTransactionsForWallet(String walletId, {bool isRefresh})` | `Future<void>` | Fetch transactions for a single wallet |
+| `fetchTransactionsForWallets(List<String> walletIds, {bool isRefresh, bool useCache})` | `Future<void>` | Fetch transactions for multiple wallets in parallel |
+| `refreshTransactionsForWallet(String walletId)` | `Future<void>` | Convenience refresh for a single wallet |
+| `clearTransactions()` | `void` | Clear all cached transaction data |
+| `clearTransactionsForWallet(String walletId)` | `void` | Clear transactions for a specific wallet |
+
+**Convenience getters on state**
+
+- `getTransactionsForWallet(String walletId)` — returns the transaction list or empty.
+- `hasTransactionsForWallet(String walletId)` — returns `true` if data exists for the wallet.
+
+### EmbeddedWalletBalanceNotifier
+
+Manages wallet balances as a `Map<String, double>`.
+
+```dart
+final notifier = EmbeddedWalletBalanceNotifier(
+  walletDataSource: myDataSource,
+  cache: myBalanceCache,
+  onBalancesUpdated: () async => refreshUI(),
+  initialBalances: {'wlt_1': 100.0},
+);
+```
+
+**Methods**
+
+| Method | Return | Description |
+| ------ | ------ | ----------- |
+| `fetchWalletBalances(List<String> walletIds, {bool isCache})` | `Future<void>` | Fetch balances from data source; optionally cache |
+| `getWalletBalance(String walletId)` | `double` | Returns balance for a wallet (0.0 if unknown) |
+| `updateWallets(List<EmbeddedWallet> newWallets)` | `void` | Update balance map from wallet list |
+| `clearBalances()` | `void` | Reset all balances to empty |
+
+### Helper function
+
+```dart
+List<EmbeddedWallet> computeEmbeddedWalletTabs(
+  List<EmbeddedWallet> availableWallets,
+);
+```
+
+Sorts wallets so that default wallets appear first (used for tab ordering in
+carousel UIs).
+
+---
+
+## Data models
+
+### EmbeddedWallet
+
+Represents a user's wallet.
+
+```dart
+EmbeddedWallet(
+  walletId: 'wlt_abc123',
+  walletIndex: 0,
+  name: 'My Naira Wallet',
+  currency: 'NGN',
+  balance: 5000.0,
+  isDefault: true,
+  isActive: true,
+  colorCode: '#7C3AED',
+  description: 'Primary wallet',
+  createdAt: '2026-03-26T12:00:00Z',
 )
 ```
 
-## Feature-aware composition
+| Field | Type | Default | Description |
+| ----- | ---- | ------- | ----------- |
+| `walletId` | `String` | | Unique wallet identifier |
+| `walletIndex` | `int` | | HD derivation index |
+| `name` | `String` | | Display name |
+| `currency` | `String` | | Currency code (NGN, USD, EUR, CAD, GBP, MXN) |
+| `balance` | `double` | `0` | Current balance |
+| `isDefault` | `bool` | `false` | Whether this is the user's default wallet |
+| `isActive` | `bool` | `true` | Whether the wallet is active |
+| `description` | `String?` | | Optional description |
+| `colorCode` | `String?` | | Hex colour code for display |
+| `createdAt` | `String` | `''` | ISO 8601 creation timestamp |
 
-The wallet-aware package composes these primitives into widgets such as:
+**Computed properties**
 
-- embedded wallet transaction sections
-- wallet-aware carousel surfaces
-- feature-specific overview sections
+- `type` — returns `EmbeddedWalletType` derived from `currency`.
+- `isConsolidated` — `true` when type is `EmbeddedWalletType.consolidated`.
 
-That package is documented in its repository README:
+### EmbeddedWalletTransaction
 
-- [`bmoni_embedded_wallets_cards` on GitHub](https://github.com/bkey-inc/bmoni_embedded_wallets_cards)
+Represents a single transaction entry.
 
-## Backend APIs vs Flutter UI
+| Field | Type | Description |
+| ----- | ---- | ----------- |
+| `id` | `String` | Unique transaction ID |
+| `direction` | `EmbeddedTransactionDirection` | `incoming` or `outgoing` |
+| `delta` | `String` | Signed amount change |
+| `amount` | `String` | Absolute amount |
+| `status` | `EmbeddedWalletTransactionStatus` | Transaction status |
+| `counterpartyId` | `String?` | Counterparty identifier |
+| `counterpartyName` | `String?` | Counterparty display name |
+| `receiverName` | `String?` | Receiver display name |
+| `description` | `String?` | Transaction description |
+| `note` | `String?` | User-provided note |
+| `counterpartyType` | `EmbeddedCounterpartyType?` | Type of counterparty |
+| `createdAt` | `String` | ISO 8601 timestamp |
+| `title` | `String?` | Display title |
+| `exchangeRate` | `String?` | Applied exchange rate |
+| `counterpartyCurrency` | `String?` | Counterparty's currency |
+| `counterpartyAmount` | `String?` | Amount in counterparty currency |
+| `receiverBankName` | `String?` | Bank name for bank transfers |
+| `receiverBankAccount` | `String?` | Bank account number |
+| `currency` | `String?` | Transaction currency |
+| `narrationType` | `String?` | Narration type identifier |
 
-If you are looking for HTTP endpoints, use:
+**Computed properties**
 
-- [REST API: Wallets](/api/wallets)
-- [REST API: Cards](/api/cards)
+- `isIncoming` / `isOutgoing` — direction checks.
+- `numericAmount` — parses `amount` to `double`.
 
-Those pages describe backend contracts, not Flutter UI components.
+### Response models
+
+| Model | Fields |
+| ----- | ------ |
+| `EmbeddedWalletListResponse` | `wallets: List<EmbeddedWallet>`, `count: int` |
+| `EmbeddedWalletDetailResponse` | `walletIndex: int`, `currency: String`, `name: String`, `description: String?` |
+| `EmbeddedWalletBalanceResponse` | `balance: String`, `currency: String`, `walletId: String` |
+| `EmbeddedWalletTransactionsResponse` | `transactions: List<EmbeddedWalletTransaction>`, `count: int` |
+
+### Enums
+
+| Enum | Values |
+| ---- | ------ |
+| `EmbeddedWalletType` | `ngn`, `usd`, `eur`, `consolidated`, `cad`, `gbp`, `mxn` |
+| `EmbeddedTransactionDirection` | `incoming`, `outgoing` |
+| `EmbeddedWalletTransactionStatus` | `pending`, `completed`, `failed`, `cancelled`, `expired`, `processing` |
+| `EmbeddedCounterpartyType` | `wallet`, `user`, `bank`, `mobileMoney`, `nigeria`, `eu`, `us`, `crypto`, `phone`, `exchange`, `china`, `cad`, `canada`, `fee` |
+
+---
+
+## Contracts
+
+The package defines three abstract classes that the host app must implement
+and inject into the notifiers.
+
+### EmbeddedWalletReadDataSource
+
+```dart
+abstract class EmbeddedWalletReadDataSource {
+  Future<Either<EmbeddedFailure, EmbeddedWalletListResponse>> getWalletList();
+
+  Future<Either<EmbeddedFailure, EmbeddedWalletTransactionsResponse>>
+      getWalletTransactions({required String walletId});
+
+  Future<Either<EmbeddedFailure, EmbeddedWalletBalanceResponse>>
+      getWalletBalance({required String walletId, bool isCache = true});
+
+  Future<Either<EmbeddedFailure, EmbeddedWalletDetailResponse>>
+      getWalletById({required String walletId});
+}
+```
+
+Implement this with your HTTP client to connect to the
+[Wallets API](/api/wallets).
+
+### EmbeddedWalletStorage
+
+```dart
+abstract class EmbeddedWalletStorage {
+  Future<String?> getString(String key);
+  Future<bool> setString(String key, String value);
+}
+```
+
+Simple key-value persistence for caching wallet and transaction data.
+Typically backed by `SharedPreferences` or a secure storage provider.
+
+### EmbeddedWalletBalanceCache
+
+```dart
+abstract class EmbeddedWalletBalanceCache {
+  Future<Map<String, double>?> getBalances();
+  Future<void> saveBalances(Map<String, double> balances);
+}
+```
+
+Dedicated cache for wallet balances, separate from the general storage
+contract.
+
+---
+
+## Failure types
+
+All failures extend `EmbeddedFailure` (which extends `Equatable`).
+
+| Class | Default message |
+| ----- | --------------- |
+| `EmbeddedServerFailure` | Server error occurred |
+| `EmbeddedCacheFailure` | Cache error occurred |
+| `EmbeddedNetworkFailure` | Network error occurred |
+| `EmbeddedValidationFailure` | Validation failed |
+| `EmbeddedRateLimitFailure` | Rate limit exceeded |
+| `EmbeddedNotFoundFailure` | Resource not found |
+| `EmbeddedAuthenticationFailure` | Authentication required |
+| `EmbeddedAuthorizationFailure` | Access denied |
+
+Each accepts an optional custom `message` parameter.
+
+---
+
+## Cache keys
+
+The `EmbeddedWalletCacheKeys` class provides constants used by the notifiers
+for cache persistence:
+
+| Key | Value |
+| --- | ----- |
+| `cachedWalletList` | `'cachedWalletList'` |
+| `cachedWalletTransactions` | `'cachedWalletTransactions'` |
+| `cachedWalletBalances` | `'cachedWalletBalances'` |
+
+---
+
+## UI kit primitives used
+
+The `EmbeddedWalletTransactionsSection` widget composes these primitives from
+`bkey_uikit`:
+
+| Primitive | Usage |
+| --------- | ----- |
+| `ActivitySectionCard` | Bordered container with header, body, and footer slots |
+| `SectionHeader` | Title row with optional trailing action |
+| `BMoniTextStyles` | Typography for action labels |
+| `BMoniColors` | Loading placeholder background |
+
+See the [Misc components](/components/misc) page for details on these
+primitives.
+
+---
+
+## Usage example
+
+```dart
+// 1. Implement the contracts
+class WalletDataSource implements EmbeddedWalletReadDataSource {
+  // Wire to your HTTP client ...
+}
+
+class WalletStorage implements EmbeddedWalletStorage {
+  // Wrap SharedPreferences ...
+}
+
+class WalletBalanceCache implements EmbeddedWalletBalanceCache {
+  // Wrap your cache layer ...
+}
+
+// 2. Create Riverpod providers in the host app
+final walletListProvider = StateNotifierProvider<
+    EmbeddedWalletListNotifier, EmbeddedWalletListState>((ref) {
+  return EmbeddedWalletListNotifier(
+    walletDataSource: ref.read(walletDataSourceProvider),
+    storage: ref.read(walletStorageProvider),
+  );
+});
+
+// 3. Use the widget
+EmbeddedWalletTransactionsSection(
+  transactions: state.getTransactionsForWallet(walletId),
+  title: l10n.recentActivity,
+  emptyState: const EmptyTransactionsView(),
+  itemBuilder: (context, tx) => TransactionTile(transaction: tx),
+  viewAllLabel: l10n.viewAll,
+  onViewAll: () => context.push('/wallet/$walletId/transactions'),
+  isRefreshing: state.isLoading,
+  isInitialLoading: !state.hasTransactionsForWallet(walletId),
+)
+```
+
+---
+
+## Related pages
+
+- [Misc components](/components/misc) — `ActivitySectionCard`,
+  `SectionHeader`, `PageDotsIndicator`, `BouncingPageViewPhysics`
+- [REST API: Wallets](/api/wallets) — Backend wallet endpoints
+- [REST API: Cards](/api/cards) — Backend card endpoints
